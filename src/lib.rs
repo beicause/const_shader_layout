@@ -4,28 +4,31 @@ use glam::{
     U16Vec4, UVec2, UVec3, UVec4, Vec2, Vec3, Vec4,
 };
 
-pub trait ShaderAlign {
+pub trait ShaderLayout: Clone + Copy + 'static {
     const ALIGN: usize;
+    const SIZE: usize;
 }
 
-macro_rules! impl_raw_shader_align {
+macro_rules! impl_shader_layout_raw {
     ($($ty:ty),+$(,)?) => {
-        $(impl ShaderAlign for $ty {
-            const ALIGN: usize = size_of::<$ty>();
+        $(impl ShaderLayout for $ty {
+            const ALIGN: usize = align_of::<$ty>();
+            const SIZE: usize = size_of::<$ty>();
         })+
     };
 }
 
-macro_rules! impl_shader_align {
-    ($align:expr $(, $ty:ty)+$(,)?) => {
-        $(impl ShaderAlign for $ty {
+macro_rules! impl_shader_layout {
+    ($align:expr, $size:expr $(, $ty:ty)+$(,)?) => {
+        $(impl ShaderLayout for $ty {
             const ALIGN: usize = $align;
+            const SIZE: usize = $size;
         })+
     };
 }
 
 // Scalar
-impl_raw_shader_align!(
+impl_shader_layout_raw!(
     half::f16,
     i16,
     u16,
@@ -44,23 +47,57 @@ impl_raw_shader_align!(
 );
 
 // Vector
-impl_raw_shader_align!(
+impl_shader_layout_raw!(
     I16Vec2, U16Vec2, I16Vec4, U16Vec4, IVec2, UVec2, Vec2, IVec4, UVec4, Vec4, Quat
 );
-impl_shader_align!(8, I16Vec3, U16Vec3);
-impl_shader_align!(16, IVec3, UVec3, Vec3);
+impl_shader_layout!(8, 6, I16Vec3, U16Vec3);
+impl_shader_layout!(16, 12, IVec3, UVec3, Vec3);
 
 // Matrix
 // Can't use `Mat3` as its column vectors are not properly aligned.
-impl_raw_shader_align!(Mat2, Mat3A, Mat4);
+impl_shader_layout_raw!(Mat2, Mat3A, Mat4);
 
 // Array
-impl<T: ShaderAlign, const N: usize> ShaderAlign for [T; N] {
-    const ALIGN: usize = T::ALIGN;
+macro_rules! impl_shader_layout_array {
+    ($($ty:ty),+$(,)?) => {
+        $(
+            impl<const N: usize> $crate::ShaderLayout for [$ty; N]
+            {
+                const ALIGN: usize = <$ty as $crate::ShaderLayout>::ALIGN;
+                const SIZE: usize = <$ty as $crate::ShaderLayout>::SIZE.next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN) * N;
+            }
+
+            const _ : () = {
+                assert!(size_of::<$ty>() != 0);
+                assert!(<[$ty; 1] as $crate::ShaderLayout>::SIZE == size_of::<[$ty; 1]>());
+            };
+        )+
+    };
 }
+impl_shader_layout_array!(
+    half::f16,
+    i16,
+    u16,
+    NonZero<i16>,
+    NonZero<u16>,
+    Wrapping<i16>,
+    Wrapping<u16>,
+    f32,
+    i32,
+    u32,
+    NonZero<i32>,
+    NonZero<u32>,
+    Wrapping<f32>,
+    Wrapping<i32>,
+    Wrapping<u32>,
+);
+// Vec3 is not implemented, because total size of `[Vec3; N]` != Vec3::ALIGN * N
+impl_shader_layout_array!(
+    I16Vec2, U16Vec2, I16Vec4, U16Vec4, IVec2, UVec2, Vec2, IVec4, UVec4, Vec4, Quat
+);
 
 #[macro_export]
-macro_rules! shader_aligned {
+macro_rules! shader_layout {
     (
         $(#[$attr:meta])*
         $vis:vis struct $struct_name:ident {
@@ -70,6 +107,7 @@ macro_rules! shader_aligned {
             ),* $(,)?
         }
    ) => {
+        #[repr(C)]
         $(#[$attr])*
         $vis struct $struct_name {
             $(
@@ -79,22 +117,22 @@ macro_rules! shader_aligned {
         }
 
         $(
-            const _ :() = {
+            const _ : () = {
                 assert!(
                     size_of::<$field_ty>() != 0,
                     concat!(
-                        "In a `shader_type!`, field `",
+                        "In a `shader_layout!`, field `",
                         stringify!($struct_name), "::", stringify!($field_name),
                         "` size must not be 0",
                     ),
                 );
 
                 const OFFSET: usize = core::mem::offset_of!($struct_name, $field_name);
-                const ALIGN: usize = <$field_ty as $crate::ShaderAlign>::ALIGN;
+                const ALIGN: usize = <$field_ty as $crate::ShaderLayout>::ALIGN;
                 assert!(
                     OFFSET % ALIGN == 0,
                     concat!(
-                        "In a `shader_type!`, field `",
+                        "In a `shader_layout!`, field `",
                         stringify!($struct_name), "::", stringify!($field_name),
                         "` is not properly aligned",
                     ),
@@ -102,27 +140,35 @@ macro_rules! shader_aligned {
             };
         )*
 
-        const ALIGNS: &[usize] = &[$(
-            (<$field_ty as $crate::ShaderAlign>::ALIGN)
-        ),*];
-        const MAX_ALIGN: usize = {
-            let mut max = ALIGNS[0];
-            let mut i = 1;
-            while i < ALIGNS.len() {
-                if ALIGNS[i] > max {
-                    max = ALIGNS[i];
+        impl $crate::ShaderLayout for $struct_name {
+            const ALIGN: usize = {
+                const MEMBER_ALIGNS: &[usize] = &[$(
+                    (<$field_ty as $crate::ShaderLayout>::ALIGN)
+                ),*];
+
+                let mut max = MEMBER_ALIGNS[0];
+                let mut i = 1;
+                while i < MEMBER_ALIGNS.len() {
+                    if MEMBER_ALIGNS[i] > max {
+                        max = MEMBER_ALIGNS[i];
+                    }
+                    i += 1;
                 }
-                i += 1;
-            }
-            max
-        };
-        impl $crate::ShaderAlign for $struct_name {
-            const ALIGN: usize = MAX_ALIGN;
+                max
+            };
+            const SIZE: usize = size_of::<$struct_name>().next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN);
         }
 
-        const _: () = {
-            const fn should_impl_bytemuck_no_uninit<T: bytemuck::NoUninit>(){}
-            should_impl_bytemuck_no_uninit::<$struct_name>();
+        // Assert struct has no padding.
+        const _ : () = {
+            assert!(
+                size_of::<$struct_name>() % <$struct_name as $crate::ShaderLayout>::ALIGN == 0,
+                concat!(
+                "In a `shader_layout!`, struct `",
+                stringify!($struct_name),
+                "` size must be a multiple of its align",
+                ),
+            );
         };
     };
 }
