@@ -109,6 +109,7 @@ macro_rules! shader_layout {
             ),* $(,)?
         }
    ) => {
+        #[derive(Copy, Clone)]
         #[repr(C)]
         $(#[$attr])*
         $vis struct $struct_name {

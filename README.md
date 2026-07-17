@@ -5,8 +5,7 @@ Compile-time checks and marker trait `ShaderLayout` for whether structs conform 
 
 Usage:
 ```rust
-shader_type! {
-    #[derive(Copy, Clone)]
+shader_layout! {
     pub struct MyUniform {
         a1: f32,
         a2: [f32; 2],
@@ -20,7 +19,6 @@ shader_type! {
 Compilation error if not aligned:
 ```rust
 shader_layout! {
-    #[derive(Copy, Clone)]
     pub struct MyUniform {
         a1: f32,
         a2: [f32; 2],
@@ -61,7 +59,6 @@ error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` siz
 Compilation error if struct size doesn't match shader struct size:
 ```rust
 shader_layout! {
-    #[derive(Copy, Clone)]
     pub struct MyUniform {
         a1: f32,
         a2: [f32; 2],

@@ -1,7 +1,6 @@
 use const_shader_layout::shader_layout;
 
 shader_layout! {
-    #[derive(Copy, Clone)]
     pub struct MyUniform {
         a1: f32,
         a2: [f32; 2],
