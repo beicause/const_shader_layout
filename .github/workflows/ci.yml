@@ -34,8 +34,8 @@ jobs:
   build:
     needs: lint
     name: Build ${{matrix.os}}
-    # runtime is normally x minutes
-    timeout-minutes: 5
+    # runtime is normally 2 minutes
+    timeout-minutes: 8
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
@@ -84,7 +84,7 @@ jobs:
   build-wasm:
     needs: lint
     name: Build wasm
-    # runtime is normally 5 minutes
+    # runtime is normally 30 seconds
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -122,7 +122,7 @@ jobs:
   build-android:
     needs: lint
     name: Build android
-    # runtime is normally 5 minutes
+    # runtime is normally 30 seconds
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
@@ -165,4 +165,4 @@ jobs:
           export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/${{env.ANDROID_NDK_VERSION}}
           && export ANDROID_NDK_ROOT=${ANDROID_NDK_HOME}
           && cargo ndk-env -t arm64-v8a
-          && cargo ndk -t arm64-v8a -P 26 build --features bevy/android-game-activity
+          && cargo ndk -t arm64-v8a -P 26 build
