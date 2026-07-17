@@ -33,24 +33,24 @@ error[E0080]: evaluation panicked: In a `shader_layout!`, field `MyUniform::a4` 
   --> tests/simple.rs:3:1
    |
  3 | / shader_layout! {
- 4 | |     #[derive(Copy, Clone)]
- 5 | |     pub struct MyUniform {
- 6 | |         a1: f32,
+ 4 | |     pub struct MyUniform {
+ 5 | |         a1: f32,
+ 6 | |         a2: [f32; 2],
 ...  |
-12 | | }
+11 | | }
    | |_^ evaluation of `_` failed here
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` size must be a multiple of its align
+error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), justPastLastMember))`
   --> tests/simple.rs:3:1
    |
  3 | / shader_layout! {
- 4 | |     #[derive(Copy, Clone)]
- 5 | |     pub struct MyUniform {
- 6 | |         a1: f32,
+ 4 | |     pub struct MyUniform {
+ 5 | |         a1: f32,
+ 6 | |         a2: [f32; 2],
 ...  |
-12 | | }
+11 | | }
    | |_^ evaluation of `_` failed here
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)
@@ -68,15 +68,15 @@ shader_layout! {
 }
 ```
 ```
-error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` size must be a multiple of its align
+error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), justPastLastMember))`
   --> tests/simple.rs:3:1
    |
  3 | / shader_layout! {
- 4 | |     #[derive(Copy, Clone)]
- 5 | |     pub struct MyUniform {
- 6 | |         a1: f32,
+ 4 | |     pub struct MyUniform {
+ 5 | |         a1: f32,
+ 6 | |         a2: [f32; 2],
 ...  |
-11 | | }
+10 | | }
    | |_^ evaluation of `_` failed here
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)

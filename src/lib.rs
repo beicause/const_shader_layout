@@ -70,8 +70,16 @@ macro_rules! impl_shader_layout_array {
                 ).unwrap();
             }
 
+            // Assert array size is equal to `N × roundUp(AlignOf(E), SizeOf(E))`
             const _ : () = {
-                assert!(<[$ty; 1] as $crate::ShaderLayout>::SIZE.get() == size_of::<[$ty; 1]>() as u64);
+                assert!(
+                    <[$ty; 1] as $crate::ShaderLayout>::SIZE.get() == size_of::<[$ty; 1]>() as u64,
+                    concat!(
+                        "Size of `[",
+                        stringify!($ty),
+                        "; N]` must be equal to its shader size, i.e. `N × roundUp(AlignOf(E), SizeOf(E))`",
+                    ),
+                );
             };
         )+
     };
@@ -93,7 +101,7 @@ impl_shader_layout_array!(
     Wrapping<i32>,
     Wrapping<u32>,
 );
-// Vec3 is not implemented, because total size of `[Vec3; N]` != Vec3::ALIGN * N
+// Vec3 is not implemented, because total size of `[Vec3; N]` != `N × roundUp(AlignOf(E), SizeOf(E))`
 impl_shader_layout_array!(
     I16Vec2, U16Vec2, I16Vec4, U16Vec4, IVec2, UVec2, Vec2, IVec4, UVec4, Vec4, Quat
 );
@@ -155,14 +163,14 @@ macro_rules! shader_layout {
             ).unwrap();
         }
 
-        // Assert struct has no padding.
+        // Assert struct has no padding, i.e. size must be equal to `roundUp(AlignOf(S), justPastLastMember))`
         const _ : () = {
             assert!(
-                (size_of::<$struct_name>() as u64) % <$struct_name as $crate::ShaderLayout>::ALIGN.get() == 0,
+                (size_of::<$struct_name>() as u64) == <$struct_name as $crate::ShaderLayout>::SIZE.get(),
                 concat!(
                 "In a `shader_layout!`, struct `",
                 stringify!($struct_name),
-                "` size must be a multiple of its align",
+                "` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), justPastLastMember))`",
                 ),
             );
         };
