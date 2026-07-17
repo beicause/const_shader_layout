@@ -10,3 +10,6 @@ glam = {
   features = ["i16", "i32", "std", "u16", "u32"]
 }
 half = { version = "2.7.1", default-features = false }
+
+[dev-dependencies]
+trybuild = { version = "1.0.118", default-features = false }

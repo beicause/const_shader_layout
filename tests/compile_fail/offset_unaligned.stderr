@@ -1,0 +1,12 @@
+error[E0080]: evaluation panicked: In a `shader_layout!`, field `MyUniform::a4` is not properly aligned
+ --> tests/compile_fail/offset_unaligned.rs:4:1
+  |
+4 | / shader_layout! {
+5 | |     pub struct MyUniform {
+6 | |         a1: f32,
+7 | |         a4: glam::Vec3,
+8 | |     }
+9 | | }
+  | |_^ evaluation of `_` failed here
+  |
+  = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)

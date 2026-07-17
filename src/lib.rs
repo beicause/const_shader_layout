@@ -132,7 +132,7 @@ macro_rules! shader_layout {
                 const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 assert!(
-                    OFFSET % ALIGN == 0,
+                    OFFSET.is_multiple_of(ALIGN),
                     concat!(
                         "In a `shader_layout!`, field `",
                         stringify!($struct_name), "::", stringify!($field_name),

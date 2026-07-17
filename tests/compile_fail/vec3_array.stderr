@@ -1,0 +1,50 @@
+error[E0277]: the trait bound `[Vec3; 1]: ShaderLayout` is not satisfied
+ --> tests/compile_fail/vec3_array.rs:5:13
+  |
+5 |         a4: [glam::Vec3; 1],
+  |             ^^^^^^^^^^^^^^^ the trait `ShaderLayout` is not implemented for `[Vec3; 1]`
+  |
+  = help: the following other types implement trait `ShaderLayout`:
+            [I16Vec2; N]
+            [I16Vec4; N]
+            [IVec2; N]
+            [IVec4; N]
+            [NonZero<i16>; N]
+            [NonZero<i32>; N]
+            [NonZero<u16>; N]
+            [NonZero<u32>; N]
+          and $N others
+
+error[E0277]: the trait bound `[IVec3; 1]: ShaderLayout` is not satisfied
+  --> tests/compile_fail/vec3_array.rs:11:13
+   |
+11 |         a4: [glam::IVec3; 1],
+   |             ^^^^^^^^^^^^^^^^ the trait `ShaderLayout` is not implemented for `[IVec3; 1]`
+   |
+   = help: the following other types implement trait `ShaderLayout`:
+             [I16Vec2; N]
+             [I16Vec4; N]
+             [IVec2; N]
+             [IVec4; N]
+             [NonZero<i16>; N]
+             [NonZero<i32>; N]
+             [NonZero<u16>; N]
+             [NonZero<u32>; N]
+           and $N others
+
+error[E0277]: the trait bound `[UVec3; 1]: ShaderLayout` is not satisfied
+  --> tests/compile_fail/vec3_array.rs:17:13
+   |
+17 |         a4: [glam::UVec3; 1],
+   |             ^^^^^^^^^^^^^^^^ the trait `ShaderLayout` is not implemented for `[UVec3; 1]`
+   |
+   = help: the following other types implement trait `ShaderLayout`:
+             [I16Vec2; N]
+             [I16Vec4; N]
+             [IVec2; N]
+             [IVec4; N]
+             [NonZero<i16>; N]
+             [NonZero<i32>; N]
+             [NonZero<u16>; N]
+             [NonZero<u32>; N]
+           and $N others

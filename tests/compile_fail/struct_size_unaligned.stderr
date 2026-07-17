@@ -1,0 +1,11 @@
+error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), justPastLastMember))`
+ --> tests/compile_fail/struct_size_unaligned.rs:3:1
+  |
+3 | / shader_layout! {
+4 | |     pub struct MyUniform {
+5 | |         a4: glam::Vec3,
+6 | |     }
+7 | | }
+  | |_^ evaluation of `_` failed here
+  |
+  = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)
