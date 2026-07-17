@@ -4,28 +4,28 @@ use glam::{
     U16Vec4, UVec2, UVec3, UVec4, Vec2, Vec3, Vec4,
 };
 
-pub trait ShaderType {
+pub trait ShaderAlign {
     const ALIGN: usize;
 }
 
-macro_rules! impl_raw_shader_type {
+macro_rules! impl_raw_shader_align {
     ($($ty:ty),+$(,)?) => {
-        $(impl ShaderType for $ty {
+        $(impl ShaderAlign for $ty {
             const ALIGN: usize = size_of::<$ty>();
         })+
     };
 }
 
-macro_rules! impl_shader_type {
+macro_rules! impl_shader_align {
     ($align:expr $(, $ty:ty)+$(,)?) => {
-        $(impl ShaderType for $ty {
+        $(impl ShaderAlign for $ty {
             const ALIGN: usize = $align;
         })+
     };
 }
 
 // Scalar
-impl_raw_shader_type!(
+impl_raw_shader_align!(
     half::f16,
     i16,
     u16,
@@ -44,23 +44,23 @@ impl_raw_shader_type!(
 );
 
 // Vector
-impl_raw_shader_type!(
+impl_raw_shader_align!(
     I16Vec2, U16Vec2, I16Vec4, U16Vec4, IVec2, UVec2, Vec2, IVec4, UVec4, Vec4, Quat
 );
-impl_shader_type!(8, I16Vec3, U16Vec3);
-impl_shader_type!(16, IVec3, UVec3, Vec3);
+impl_shader_align!(8, I16Vec3, U16Vec3);
+impl_shader_align!(16, IVec3, UVec3, Vec3);
 
 // Matrix
 // Can't use `Mat3` as its column vectors are not properly aligned.
-impl_raw_shader_type!(Mat2, Mat3A, Mat4);
+impl_raw_shader_align!(Mat2, Mat3A, Mat4);
 
 // Array
-impl<T: ShaderType, const N: usize> ShaderType for [T; N] {
+impl<T: ShaderAlign, const N: usize> ShaderAlign for [T; N] {
     const ALIGN: usize = T::ALIGN;
 }
 
 #[macro_export]
-macro_rules! shader_type {
+macro_rules! shader_aligned {
     (
         $(#[$attr:meta])*
         $vis:vis struct $struct_name:ident {
@@ -90,7 +90,7 @@ macro_rules! shader_type {
                 );
 
                 const OFFSET: usize = core::mem::offset_of!($struct_name, $field_name);
-                const ALIGN: usize = <$field_ty as $crate::ShaderType>::ALIGN;
+                const ALIGN: usize = <$field_ty as $crate::ShaderAlign>::ALIGN;
                 assert!(
                     OFFSET % ALIGN == 0,
                     concat!(
@@ -103,7 +103,7 @@ macro_rules! shader_type {
         )*
 
         const ALIGNS: &[usize] = &[$(
-            (<$field_ty as $crate::ShaderType>::ALIGN)
+            (<$field_ty as $crate::ShaderAlign>::ALIGN)
         ),*];
         const MAX_ALIGN: usize = {
             let mut max = ALIGNS[0];
@@ -116,19 +116,13 @@ macro_rules! shader_type {
             }
             max
         };
-        impl $crate::ShaderType for $struct_name {
+        impl $crate::ShaderAlign for $struct_name {
             const ALIGN: usize = MAX_ALIGN;
         }
-    };
-}
 
-shader_type! {
-    #[derive(bytemuck::NoUninit, Copy, Clone)]
-    #[repr(C)]
-    pub struct MyUniform {
-        a1: f32,
-        a2: [f32; 2],
-        a3: [f32; 1],
-        a4: Vec3,
-    }
+        const _: () = {
+            const fn should_impl_bytemuck_no_uninit<T: bytemuck::NoUninit>(){}
+            should_impl_bytemuck_no_uninit::<$struct_name>();
+        };
+    };
 }
