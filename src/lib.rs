@@ -5,15 +5,15 @@ use glam::{
 };
 
 pub trait ShaderLayout: Clone + Copy + 'static {
-    const ALIGN: usize;
-    const SIZE: usize;
+    const ALIGN: NonZero<u64>;
+    const SIZE: NonZero<u64>;
 }
 
 macro_rules! impl_shader_layout_raw {
     ($($ty:ty),+$(,)?) => {
         $(impl ShaderLayout for $ty {
-            const ALIGN: usize = align_of::<$ty>();
-            const SIZE: usize = size_of::<$ty>();
+            const ALIGN: NonZero<u64> = NonZero::new(align_of::<$ty>() as u64).unwrap();
+            const SIZE: NonZero<u64> = NonZero::new(size_of::<$ty>() as u64).unwrap();
         })+
     };
 }
@@ -21,8 +21,8 @@ macro_rules! impl_shader_layout_raw {
 macro_rules! impl_shader_layout {
     ($align:expr, $size:expr $(, $ty:ty)+$(,)?) => {
         $(impl ShaderLayout for $ty {
-            const ALIGN: usize = $align;
-            const SIZE: usize = $size;
+            const ALIGN: NonZero<u64> = NonZero::new($align).unwrap();
+            const SIZE: NonZero<u64> = NonZero::new($size).unwrap();
         })+
     };
 }
@@ -63,13 +63,15 @@ macro_rules! impl_shader_layout_array {
         $(
             impl<const N: usize> $crate::ShaderLayout for [$ty; N]
             {
-                const ALIGN: usize = <$ty as $crate::ShaderLayout>::ALIGN;
-                const SIZE: usize = <$ty as $crate::ShaderLayout>::SIZE.next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN) * N;
+                const ALIGN: NonZero<u64> = <$ty as $crate::ShaderLayout>::ALIGN;
+                const SIZE: NonZero<u64> = NonZero::new(
+                    <$ty as $crate::ShaderLayout>::SIZE.get()
+                        .next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64
+                ).unwrap();
             }
 
             const _ : () = {
-                assert!(size_of::<$ty>() != 0);
-                assert!(<[$ty; 1] as $crate::ShaderLayout>::SIZE == size_of::<[$ty; 1]>());
+                assert!(<[$ty; 1] as $crate::ShaderLayout>::SIZE.get() == size_of::<[$ty; 1]>() as u64);
             };
         )+
     };
@@ -118,17 +120,8 @@ macro_rules! shader_layout {
 
         $(
             const _ : () = {
-                assert!(
-                    size_of::<$field_ty>() != 0,
-                    concat!(
-                        "In a `shader_layout!`, field `",
-                        stringify!($struct_name), "::", stringify!($field_name),
-                        "` size must not be 0",
-                    ),
-                );
-
-                const OFFSET: usize = core::mem::offset_of!($struct_name, $field_name);
-                const ALIGN: usize = <$field_ty as $crate::ShaderLayout>::ALIGN;
+                const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
+                const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 assert!(
                     OFFSET % ALIGN == 0,
                     concat!(
@@ -141,9 +134,9 @@ macro_rules! shader_layout {
         )*
 
         impl $crate::ShaderLayout for $struct_name {
-            const ALIGN: usize = {
-                const MEMBER_ALIGNS: &[usize] = &[$(
-                    (<$field_ty as $crate::ShaderLayout>::ALIGN)
+            const ALIGN: ::core::num::NonZero<u64> = {
+                const MEMBER_ALIGNS: &[u64] = &[$(
+                    (<$field_ty as $crate::ShaderLayout>::ALIGN.get())
                 ),*];
 
                 let mut max = MEMBER_ALIGNS[0];
@@ -154,15 +147,17 @@ macro_rules! shader_layout {
                     }
                     i += 1;
                 }
-                max
+                ::core::num::NonZero::new(max).unwrap()
             };
-            const SIZE: usize = size_of::<$struct_name>().next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN);
+            const SIZE: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
+                (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get())
+            ).unwrap();
         }
 
         // Assert struct has no padding.
         const _ : () = {
             assert!(
-                size_of::<$struct_name>() % <$struct_name as $crate::ShaderLayout>::ALIGN == 0,
+                (size_of::<$struct_name>() as u64) % <$struct_name as $crate::ShaderLayout>::ALIGN.get() == 0,
                 concat!(
                 "In a `shader_layout!`, struct `",
                 stringify!($struct_name),
