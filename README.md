@@ -1,9 +1,12 @@
-> [!NOTE]
-> This is experimental
+# Compile-time checks for whether structs conform to WGSL's [memory layout rules](https://www.w3.org/TR/WGSL/#alignment-and-size).
 
-Compile-time checks and marker trait `ShaderLayout` for whether structs conform to WGSL's [memory layout rules](https://www.w3.org/TR/WGSL/#alignment-and-size).
+[![Build](https://github.com/beicause/const_shader_layout/actions/workflows/ci.yml/badge.svg)](https://github.com/beicause/const_shader_layout/actions)
+[![License](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg)](https://github.com/beicause/const_shader_layout)
+[![Cargo](https://img.shields.io/crates/v/const_shader_layout.svg)](https://crates.io/crates/const_shader_layout)
+[![Documentation](https://docs.rs/const_shader_layout/badge.svg)](https://docs.rs/const_shader_layout)
 
-Usage:
+
+This provides `shader_layout!` macro and `ShaderLayout` trait. Usage:
 ```rust
 shader_layout! {
     pub struct MyUniform {
@@ -15,4 +18,7 @@ shader_layout! {
     }
 }
 ```
-See https://github.com/beicause/const_shader_layout/tree/master/tests/compile_fail for what this checks.
+
+See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what this supports and checks.
+
+[Uniform address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) is not checked yet.

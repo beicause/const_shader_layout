@@ -1,9 +1,12 @@
+#![no_std]
+
 use core::num::{NonZero, Wrapping};
 use glam::{
     I16Vec2, I16Vec3, I16Vec4, IVec2, IVec3, IVec4, Mat2, Mat3A, Mat4, Quat, U16Vec2, U16Vec3,
     U16Vec4, UVec2, UVec3, UVec4, Vec2, Vec3, Vec4,
 };
 
+/// Marks the type's alignment and size in shader layout.
 pub trait ShaderLayout: Clone + Copy + 'static {
     const ALIGN: NonZero<u64>;
     const SIZE: NonZero<u64>;
@@ -109,6 +112,7 @@ impl_shader_layout_array!(
     I16Vec2, U16Vec2, I16Vec4, U16Vec4, IVec2, UVec2, Vec2, IVec4, UVec4, Vec4, Quat
 );
 
+/// Checks if all the struct's fields conform to shader layout then implement [`ShaderLayout`] for this struct, or fails at compile-time.
 #[macro_export]
 macro_rules! shader_layout {
     (
