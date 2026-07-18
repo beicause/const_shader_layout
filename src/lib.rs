@@ -12,6 +12,8 @@ pub trait ShaderLayout: Clone + Copy + 'static {
     const SIZE: NonZero<u64>;
 }
 
+/// Implements [`ShaderLayout`] for the types, with their original alignment and size.
+#[macro_export]
 macro_rules! impl_shader_layout_raw {
     ($($ty:ty),+$(,)?) => {
         $(impl $crate::ShaderLayout for $ty {
@@ -20,16 +22,9 @@ macro_rules! impl_shader_layout_raw {
         })+
     };
 }
-#[cfg_attr(
-    not(feature = "half"),
-    expect(unused, reason = "This is only used across modules with some features")
-)]
-pub(crate) use impl_shader_layout_raw;
 
-#[cfg_attr(
-    not(feature = "glam"),
-    expect(unused, reason = "This is only used with some features")
-)]
+/// Implements [`ShaderLayout`] for the types, with the specified alignment and size.
+#[macro_export]
 macro_rules! impl_shader_layout {
     ($align:expr, $size:expr $(, $ty:ty)+$(,)?) => {
         $(impl $crate::ShaderLayout for $ty {
@@ -38,12 +33,9 @@ macro_rules! impl_shader_layout {
         })+
     };
 }
-#[cfg_attr(
-    not(feature = "glam"),
-    expect(unused, reason = "This is only used across modules with some features")
-)]
-pub(crate) use impl_shader_layout;
 
+/// Implements [`ShaderLayout`] for `[T; N]` for types implemented [`ShaderLayout`].
+#[macro_export]
 macro_rules! impl_shader_layout_array {
     ($($ty:ty),+$(,)?) => {
         $(
@@ -70,11 +62,6 @@ macro_rules! impl_shader_layout_array {
         )+
     };
 }
-#[cfg_attr(
-    all(not(feature = "glam"), not(feature = "half")),
-    expect(unused, reason = "This is only used across modules with some features")
-)]
-pub(crate) use impl_shader_layout_array;
 
 // Scalar
 impl_shader_layout_raw!(
