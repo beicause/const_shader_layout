@@ -6,8 +6,11 @@
 [![Documentation](https://docs.rs/const_shader_layout/badge.svg)](https://docs.rs/const_shader_layout)
 
 
-This provides `shader_layout!` macro and `ShaderLayout` trait. Usage:
+The core of this crate is the [`shader_layout`] macro and the [`ShaderLayout`] trait.
 ```rust
+use const_shader_layout::shader_layout;
+use glam::Vec3;
+
 shader_layout! {
     pub struct MyUniform {
         a1: f32,
@@ -21,4 +24,4 @@ shader_layout! {
 
 See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what this supports and checks.
 
-[Uniform address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) is not checked yet.
+Note: [Uniform address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) is not checked yet.

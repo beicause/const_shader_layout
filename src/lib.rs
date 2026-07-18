@@ -1,15 +1,20 @@
+#![doc = include_str!("../README.md")]
+#![cfg_attr(docsrs, feature(doc_cfg), doc(auto_cfg = false))]
 #![no_std]
 
 use core::num::{NonZero, Wrapping};
 #[cfg(feature = "glam")]
+#[cfg_attr(docsrs, doc(cfg(feature = "glam")))]
 mod glam;
 #[cfg(feature = "half")]
+#[cfg_attr(docsrs, doc(cfg(feature = "half")))]
 mod half;
 
 /// Marks the type's alignment requirement in shader.
 ///
 /// Note: The `size_of::<T>` must be equal to its size in shader.
 pub trait ShaderLayout: Clone + Copy + 'static {
+    /// The type's alignment requirement in shader.
     const ALIGN: NonZero<u64>;
 }
 

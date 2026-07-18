@@ -8,6 +8,16 @@ license = "MIT OR Apache-2.0"
 keywords = ["const", "macro", "shader", "wgsl"]
 exclude = [".github"]
 
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+no-default-features = true
+features = [
+  "glam",
+  "half",
+  "std",
+]
+rustdoc-args = ["--cfg", "docsrs"]
+
 [[test]]
 name = "compile"
 path = "tests/compile.rs"
