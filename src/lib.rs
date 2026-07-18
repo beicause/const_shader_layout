@@ -1,15 +1,16 @@
 #![no_std]
 
 use core::num::{NonZero, Wrapping};
-#[cfg(any(feature = "glam", feature = "glam_32"))]
+#[cfg(feature = "glam")]
 mod glam;
 #[cfg(feature = "half")]
 mod half;
 
-/// Marks the type's alignment and size in shader layout.
+/// Marks the type's alignment requirement in shader.
+///
+/// Note: The `size_of::<T>` must be equal to its size in shader.
 pub trait ShaderLayout: Clone + Copy + 'static {
     const ALIGN: NonZero<u64>;
-    const SIZE: NonZero<u64>;
 }
 
 /// Implements [`ShaderLayout`] for the types, with their original alignment and size.
@@ -18,7 +19,6 @@ macro_rules! impl_shader_layout_raw {
     ($($ty:ty),+$(,)?) => {
         $(impl $crate::ShaderLayout for $ty {
             const ALIGN: ::core::num::NonZero<u64> = ::core::num::NonZero::new(align_of::<$ty>() as u64).unwrap();
-            const SIZE: ::core::num::NonZero<u64> = ::core::num::NonZero::new(size_of::<$ty>() as u64).unwrap();
         })+
     };
 }
@@ -26,15 +26,17 @@ macro_rules! impl_shader_layout_raw {
 /// Implements [`ShaderLayout`] for the types, with the specified alignment and size.
 #[macro_export]
 macro_rules! impl_shader_layout {
-    ($align:expr, $size:expr $(, $ty:ty)+$(,)?) => {
+    ($align:expr $(, $ty:ty)+$(,)?) => {
         $(impl $crate::ShaderLayout for $ty {
             const ALIGN: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align).unwrap();
-            const SIZE: ::core::num::NonZero<u64> = ::core::num::NonZero::new($size).unwrap();
         })+
     };
 }
 
 /// Implements [`ShaderLayout`] for `[T; N]` for types implemented [`ShaderLayout`].
+///
+/// Checks at compile-time:
+/// * Array size must be equal to `N × roundUp(AlignOf(E), SizeOf(E))`.
 #[macro_export]
 macro_rules! impl_shader_layout_array {
     ($($ty:ty),+$(,)?) => {
@@ -42,16 +44,14 @@ macro_rules! impl_shader_layout_array {
             impl<const N: usize> $crate::ShaderLayout for [$ty; N]
             {
                 const ALIGN: ::core::num::NonZero<u64> = <$ty as $crate::ShaderLayout>::ALIGN;
-                const SIZE: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                    <$ty as $crate::ShaderLayout>::SIZE.get()
-                        .next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64
-                ).unwrap();
             }
 
             // Assert array size is equal to `N × roundUp(AlignOf(E), SizeOf(E))`
             const _ : () = {
+                const N: usize = 1;
+                const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64;
                 assert!(
-                    <[$ty; 1] as $crate::ShaderLayout>::SIZE.get() == size_of::<[$ty; 1]>() as u64,
+                    SIZE == size_of::<[$ty; N]>() as u64,
                     concat!(
                         "Size of `[",
                         stringify!($ty),
@@ -100,6 +100,10 @@ impl_shader_layout_array!(
 );
 
 /// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.
+///
+/// Checks at compile-time:
+/// * For each field, `core::mem::offset_of!(struct, field)` must be equal to its [`ShaderLayout::ALIGN`].
+/// * Struct size must be equal to `roundUp(AlignOf(S), SizeOf(S)))`.
 #[macro_export]
 macro_rules! shader_layout {
     (
@@ -152,19 +156,18 @@ macro_rules! shader_layout {
                 }
                 ::core::num::NonZero::new(max).unwrap()
             };
-            const SIZE: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get())
-            ).unwrap();
         }
 
         // Assert struct has no padding, i.e. size must be equal to `roundUp(AlignOf(S), justPastLastMember))`
+        // `justPastLastMember` is equal to `size_of::<S>()` in `repr(C)`.
         const _ : () = {
+            const SIZE: u64 = (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get());
             assert!(
-                (size_of::<$struct_name>() as u64) == <$struct_name as $crate::ShaderLayout>::SIZE.get(),
+                (size_of::<$struct_name>() as u64) == SIZE,
                 concat!(
                 "In a `shader_layout!`, struct `",
                 stringify!($struct_name),
-                "` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), justPastLastMember))`",
+                "` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
                 ),
             );
         };
