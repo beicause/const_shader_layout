@@ -8,13 +8,46 @@ license = "MIT OR Apache-2.0"
 keywords = ["const", "macro", "shader", "wgsl"]
 exclude = [".github"]
 
+[[test]]
+name = "compile"
+path = "tests/compile.rs"
+required-features = ["glam", "half", "std"]
+
 [dependencies]
 glam = {
-  version = "0.33.2",
+  version = "0.33",
   default-features = false,
-  features = ["i16", "i32", "std", "u16", "u32"]
+  features = ["i16", "i32", "u16", "u32"],
+  optional = true
 }
-half = { version = "2.7.1", default-features = false }
+glam_32 = {
+  package = "glam",
+  version = "0.32",
+  default-features = false,
+  optional = true
+}
+half = { version = "2", default-features = false, optional = true }
 
 [dev-dependencies]
 trybuild = { version = "1.0.118", default-features = false }
+
+[features]
+default = ["glam", "std"]
+
+# Implements `ShaderLayout` for `glam`(latest) types. Overrides other `glam_*` features.
+glam = ["dep:glam"]
+
+# Implements `ShaderLayout` for `glam`(v0.32) types.
+glam_32 = ["dep:glam_32"]
+
+# Implements `ShaderLayout` for `half::f16`.
+half = ["dep:half"]
+
+# Reexports `glam`'s `libm` feature.
+libm = ["glam_32?/libm", "glam?/libm"]
+
+# Reexports `glam`'s `nostd-libm` feature.
+nostd-libm = ["glam_32?/nostd-libm", "glam?/nostd-libm"]
+
+# Reexports `glam`'s `std` feature.
+std = ["glam_32?/std", "glam?/std"]
