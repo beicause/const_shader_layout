@@ -10,7 +10,7 @@ The core of this crate is the [`shader_layout`], [`shader_layout_compat`] macros
 
 `ShaderLayout` is corresponding to <https://www.w3.org/TR/WGSL/#alignment-and-size>.
 
-`ShaderLayoutCompat` is a subset of `ShaderLayout` and is corresponding to [uniform address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) without [uniform_buffer_standard_layout](https://www.w3.org/TR/WGSL/#language_extension-uniform_buffer_standard_layout).
+`ShaderLayoutCompat` is a subset of `ShaderLayout` and is corresponding to [address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) of uniform without [uniform_buffer_standard_layout](https://www.w3.org/TR/WGSL/#language_extension-uniform_buffer_standard_layout) language extension.
 
 ```rust
 use const_shader_layout::{shader_layout, shader_layout_compat, ShaderLayout, ShaderLayoutCompat};
@@ -33,7 +33,7 @@ const {
 }
 
 shader_layout_compat! {
-    pub struct Nersted {
+    pub struct Nested {
         a1: [Vec4; 2],
         a2: Vec3,
         a3: f32
@@ -41,15 +41,15 @@ shader_layout_compat! {
 }
 shader_layout_compat! {
     pub struct MyUniform {
-        a1: Nersted,
+        a1: Nested,
         a2: Vec3,
         // Padding is not needed, because struct size (64) aligned to 16 in `repr(C)`, so it matches shader size (64).
     }
 }
 const {
-    assert!(<Nersted as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
-    assert!(<Nersted as ShaderLayoutCompat>::SIZE_COMPAT.get() == 48);
-    assert!(size_of::<Nersted>() == 48);
+    assert!(<Nested as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
+    assert!(<Nested as ShaderLayoutCompat>::SIZE_COMPAT.get() == 48);
+    assert!(size_of::<Nested>() == 48);
     assert!(<MyUniform as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
     assert!(<MyUniform as ShaderLayoutCompat>::SIZE_COMPAT.get() == 64);
     assert!(size_of::<MyUniform>() == 64);
