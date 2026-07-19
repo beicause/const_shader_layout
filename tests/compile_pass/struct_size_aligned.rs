@@ -1,3 +1,4 @@
+//@check-pass
 use const_shader_layout::shader_layout_compat;
 
 // Succeeds because it is explicitly aligned in `repr(align(16))`.
@@ -7,5 +8,3 @@ shader_layout_compat! {
         a1: glam::Vec3,
     }
 }
-
-fn main() {}

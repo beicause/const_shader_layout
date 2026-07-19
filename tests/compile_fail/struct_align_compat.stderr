@@ -2,11 +2,15 @@ error[E0080]: evaluation panicked: In a `shader_layout_compat!`, field `S2::a2` 
   --> tests/compile_fail/struct_align_compat.rs:9:1
    |
  9 | / shader_layout_compat! {
-10 | |     pub struct S2 {
-11 | |         a1: f32,
-12 | |         a2: S1,
-13 | |     }
-14 | | }
+10 | |
+11 | |     pub struct S2 {
+12 | |         a1: f32,
+...  |
+15 | | }
    | |_^ evaluation of `_` failed here
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0080`.

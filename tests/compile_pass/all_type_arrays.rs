@@ -1,3 +1,4 @@
+//@check-pass
 use const_shader_layout::{shader_layout, shader_layout_compat};
 use core::num::{NonZero, Wrapping};
 use glam::{
@@ -91,5 +92,3 @@ shader_layout_compat! {
         a34: [Vec4; 2],
     }
 }
-
-fn main() {}

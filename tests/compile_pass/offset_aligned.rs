@@ -1,3 +1,4 @@
+//@check-pass
 use const_shader_layout::shader_layout_compat;
 
 // Succeeds because `f32` is aligned in `repr(C)`.
@@ -7,5 +8,3 @@ shader_layout_compat! {
         a1: f32,
     }
 }
-
-fn main() {}

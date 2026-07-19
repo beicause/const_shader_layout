@@ -1,15 +1,16 @@
+//@check-pass
 use const_shader_layout::{impl_shader_layout_compat, shader_layout, shader_layout_compat};
 
 #[derive(Clone, Copy)]
-struct Vec3([f32; 3]);
+pub struct Vec3(pub [f32; 3]);
 #[derive(Clone, Copy)]
-struct Vec2([f32; 2]);
+pub struct Vec2(pub [f32; 2]);
 
 impl_shader_layout_compat!(16, 16, Vec3);
 impl_shader_layout_compat!(8, Vec2);
 
 #[derive(Clone, Copy)]
-struct Vec2x3Array([Vec2; 3]);
+pub struct Vec2x3Array(pub [Vec2; 3]);
 
 impl_shader_layout_compat!(8, 16, Vec2x3Array);
 
@@ -32,5 +33,3 @@ shader_layout_compat! {
         p3: f32,
     }
 }
-
-fn main() {}

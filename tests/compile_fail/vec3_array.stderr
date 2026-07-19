@@ -13,12 +13,12 @@ error[E0277]: the trait bound `[Vec3; 1]: ShaderLayout` is not satisfied
             [Mat3A; N]
             [Mat4; N]
             [NonZero<i16>; N]
-          and $N others
+          and 21 others
 
 error[E0277]: the trait bound `[IVec3; 1]: ShaderLayout` is not satisfied
-  --> tests/compile_fail/vec3_array.rs:11:13
+  --> tests/compile_fail/vec3_array.rs:12:13
    |
-11 |         a4: [glam::IVec3; 1],
+12 |         a4: [glam::IVec3; 1],
    |             ^^^^^^^^^^^^^^^^ the trait `ShaderLayout` is not implemented for `[IVec3; 1]`
    |
    = help: the following other types implement trait `ShaderLayout`:
@@ -30,12 +30,12 @@ error[E0277]: the trait bound `[IVec3; 1]: ShaderLayout` is not satisfied
              [Mat3A; N]
              [Mat4; N]
              [NonZero<i16>; N]
-           and $N others
+           and 21 others
 
 error[E0277]: the trait bound `[UVec3; 1]: ShaderLayout` is not satisfied
-  --> tests/compile_fail/vec3_array.rs:17:13
+  --> tests/compile_fail/vec3_array.rs:19:13
    |
-17 |         a4: [glam::UVec3; 1],
+19 |         a4: [glam::UVec3; 1],
    |             ^^^^^^^^^^^^^^^^ the trait `ShaderLayout` is not implemented for `[UVec3; 1]`
    |
    = help: the following other types implement trait `ShaderLayout`:
@@ -47,4 +47,8 @@ error[E0277]: the trait bound `[UVec3; 1]: ShaderLayout` is not satisfied
              [Mat3A; N]
              [Mat4; N]
              [NonZero<i16>; N]
-           and $N others
+           and 21 others
+
+error: aborting due to 3 previous errors
+
+For more information about this error, try `rustc --explain E0277`.

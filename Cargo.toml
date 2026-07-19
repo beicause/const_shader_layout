@@ -21,6 +21,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [[test]]
 name = "compile"
 path = "tests/compile.rs"
+harness = false
 required-features = ["glam", "half", "std"]
 
 [dependencies]
@@ -33,7 +34,8 @@ glam = {
 half = { version = "2", default-features = false, optional = true }
 
 [dev-dependencies]
-trybuild = { version = "1.0.118", default-features = false }
+half = "2"
+ui_test = "0.30.7"
 
 [features]
 default = ["glam", "std"]

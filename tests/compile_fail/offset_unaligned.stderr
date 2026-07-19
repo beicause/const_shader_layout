@@ -2,11 +2,15 @@ error[E0080]: evaluation panicked: In a `shader_layout!`, field `OffsetUnaligned
  --> tests/compile_fail/offset_unaligned.rs:3:1
   |
 3 | / shader_layout! {
-4 | |     pub struct OffsetUnaligned {
-5 | |         a1: f32,
-6 | |         a4: glam::Vec3,
-7 | |     }
-8 | | }
+4 | |
+5 | |     pub struct OffsetUnaligned {
+6 | |         a1: f32,
+... |
+9 | | }
   | |_^ evaluation of `_` failed here
   |
   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0080`.
