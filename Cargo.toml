@@ -1,6 +1,6 @@
 [package]
 name = "const_shader_layout"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "Compile-time checks for whether structs conform to WGSL's memory layout rules"
 repository = "https://github.com/beicause/const_shader_layout"
