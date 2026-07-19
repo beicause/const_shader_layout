@@ -7,6 +7,8 @@ use core::num::{NonZero, Wrapping};
 /// Marks the type's alignment requirement in shader.
 ///
 /// Note: The `size_of::<T>` must be equal to its size in shader. Thus [`bool`] should not implement this.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 pub trait ShaderLayout: Clone + Copy + 'static {
     /// The type's alignment requirement in shader.
     const ALIGN: NonZero<u64>;
@@ -176,6 +178,9 @@ macro_rules! shader_layout {
         };
     };
 }
+
+mod compat;
+pub use compat::*;
 
 #[cfg(feature = "glam")]
 #[cfg_attr(docsrs, doc(cfg(feature = "glam")))]
