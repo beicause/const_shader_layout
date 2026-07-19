@@ -12,7 +12,7 @@ mod half;
 
 /// Marks the type's alignment requirement in shader.
 ///
-/// Note: The `size_of::<T>` must be equal to its size in shader.
+/// Note: The `size_of::<T>` must be equal to its size in shader. Thus [`bool`] should not implement this.
 pub trait ShaderLayout: Clone + Copy + 'static {
     /// The type's alignment requirement in shader.
     const ALIGN: NonZero<u64>;
@@ -42,6 +42,8 @@ macro_rules! impl_shader_layout {
 ///
 /// Checks at compile-time:
 /// * Array size must be equal to `N × roundUp(AlignOf(E), SizeOf(E))`.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 #[macro_export]
 macro_rules! impl_shader_layout_array {
     ($($ty:ty),+$(,)?) => {
@@ -109,6 +111,8 @@ impl_shader_layout_array!(
 /// Checks at compile-time:
 /// * For each field, `core::mem::offset_of!(struct, field)` must be equal to its [`ShaderLayout::ALIGN`].
 /// * Struct size must be equal to `roundUp(AlignOf(S), SizeOf(S)))`.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 #[macro_export]
 macro_rules! shader_layout {
     (
