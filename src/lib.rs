@@ -66,6 +66,10 @@ macro_rules! impl_shader_layout_array {
         )+
     };
 }
+#[cfg_attr(
+    not(feature = "glam"),
+    expect(unused_imports, reason = "unused without some features")
+)]
 pub(crate) use impl_shader_layout_array;
 
 /// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.

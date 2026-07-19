@@ -52,3 +52,7 @@ nostd-libm = ["glam?/nostd-libm"]
 
 # Reexports `glam`'s `std` feature.
 std = ["glam?/std"]
+
+[lints.clippy]
+allow_attributes = "warn"
+allow_attributes_without_reason = "warn"
