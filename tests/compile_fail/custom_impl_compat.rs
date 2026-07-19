@@ -15,8 +15,8 @@ shader_layout! {
 }
 
 shader_layout_compat! {
-    //~^ ERROR: When implementing `ShaderLayoutCompat`, field `Compat::a2` has uniform layout constraints thus its size (24) must be 48
-    //~| ERROR: When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned. The offset is 8 but required align is 16
+    //~^ ERROR: Failed to impl `ShaderLayoutCompat`: Field `Compat::a2` size (24) must be 48 due to uniform layout constraints
+    //~| ERROR: Failed to impl `ShaderLayoutCompat`: Field `Compat::a2` is not properly aligned. The offset is 8 but required align is 16
     pub struct Compat {
         a1: glam::Vec2,
         a2: Vec2ArrayLen3,

@@ -138,7 +138,7 @@ macro_rules! shader_layout_compat {
 
                 const_format::assertcp!(
                     MEMBER_SIZE == MEMBER_SIZE_COMPAT,
-                        "When implementing `ShaderLayoutCompat`, field `{}::{}` has uniform layout constraints thus its size ({}) must be {}",
+                        "Failed to impl `ShaderLayoutCompat`: Field `{}::{}` size ({}) must be {} due to uniform layout constraints",
                         stringify!($struct_name),
                         stringify!($field_name),
                         MEMBER_SIZE,
@@ -147,7 +147,7 @@ macro_rules! shader_layout_compat {
 
                 const_format::assertcp!(
                     MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT),
-                        "When implementing `ShaderLayoutCompat`, field `{}::{}` is not properly aligned. \
+                        "Failed to impl `ShaderLayoutCompat`: Field `{}::{}` is not properly aligned. \
                         The offset is {} but required align is {}",
                         stringify!($struct_name),
                         stringify!($field_name),

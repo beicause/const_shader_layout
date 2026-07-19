@@ -1,4 +1,4 @@
-# Compile-time checks for whether structs conform to WGSL's [memory layout rules](https://www.w3.org/TR/WGSL/#alignment-and-size).
+# Compile-time checks to ensure structs conform to WGSL's [memory layout rules](https://www.w3.org/TR/WGSL/#alignment-and-size)
 
 [![Build](https://github.com/beicause/const_shader_layout/actions/workflows/ci.yml/badge.svg)](https://github.com/beicause/const_shader_layout/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg)](https://github.com/beicause/const_shader_layout)

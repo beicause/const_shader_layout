@@ -1,19 +1,35 @@
-error[E0080]: evaluation panicked:
+error[E0080]: evaluation panicked: 
               assertion failed.
-              When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned. The offset is 8 but required align is 16
-
+              Failed to impl `ShaderLayoutCompat`: Field `Compat::a2` size (24) must be 48 due to uniform layout constraints
+              
   --> tests/compile_fail/custom_impl_compat.rs:17:1
    |
 17 | / shader_layout_compat! {
 18 | |
-19 | |     pub struct Compat {
-20 | |         a1: glam::Vec2,
+19 | |
+20 | |     pub struct Compat {
 ...  |
-25 | | }
+26 | | }
    | |_^ evaluation of `_::_` failed here
    |
    = note: this error originates in the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error: aborting due to 1 previous error
+error[E0080]: evaluation panicked: 
+              assertion failed.
+              Failed to impl `ShaderLayoutCompat`: Field `Compat::a2` is not properly aligned. The offset is 8 but required align is 16
+              
+  --> tests/compile_fail/custom_impl_compat.rs:17:1
+   |
+17 | / shader_layout_compat! {
+18 | |
+19 | |
+20 | |     pub struct Compat {
+...  |
+26 | | }
+   | |_^ evaluation of `_::_` failed here
+   |
+   = note: this error originates in the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 2 previous errors
 
 For more information about this error, try `rustc --explain E0080`.

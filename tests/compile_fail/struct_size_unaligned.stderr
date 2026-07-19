@@ -1,6 +1,6 @@
 error[E0080]: evaluation panicked: 
               assertion failed.
-              When implementing `ShaderLayout`, struct `SizeUnaligned` size (12) must be equal to its shader size (16), i.e. `roundUp(AlignOf(S), SizeOf(S)))`
+              Failed to implement `ShaderLayout`: Struct `SizeUnaligned` size (12) must be equal to its shader size (16), i.e. `roundUp(AlignOf(S), SizeOf(S)))`
               
  --> tests/compile_fail/struct_size_unaligned.rs:3:1
   |

@@ -98,7 +98,7 @@ macro_rules! shader_layout {
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 const_format::assertcp!(
                     OFFSET.is_multiple_of(ALIGN),
-                        "When implementing `ShaderLayout`, field `{}::{}` is not properly aligned. The offset is {} but required align is {}",
+                        "Failed to implement `ShaderLayout`: Field `{}::{}` is not properly aligned. The offset is {} but required align is {}",
                         stringify!($struct_name),
                         stringify!($field_name),
                         OFFSET,
@@ -131,7 +131,7 @@ macro_rules! shader_layout {
             const SIZE: u64 = (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get());
             const_format::assertcp!(
                 (size_of::<$struct_name>() as u64) == SIZE,
-                "When implementing `ShaderLayout`, struct `{}` size ({}) must be equal to its shader size ({}), i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
+                "Failed to implement `ShaderLayout`: Struct `{}` size ({}) must be equal to its shader size ({}), i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
                 stringify!($struct_name),
                 size_of::<$struct_name>(),
                 SIZE,

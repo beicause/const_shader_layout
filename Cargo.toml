@@ -2,7 +2,7 @@
 name = "const_shader_layout"
 version = "0.3.0"
 edition = "2024"
-description = "Compile-time checks for whether structs conform to WGSL's memory layout rules"
+description = "Compile-time checks to ensure structs conform to WGSL's memory layout rules"
 repository = "https://github.com/beicause/const_shader_layout"
 license = "MIT OR Apache-2.0"
 keywords = ["const", "macro", "shader", "wgsl"]
