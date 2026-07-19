@@ -1,4 +1,4 @@
-error[E0080]: evaluation panicked: In a `shader_layout!`, struct `SizeUnaligned` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`
+error[E0080]: evaluation panicked: When implementing `ShaderLayout`, struct `SizeUnaligned` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`
  --> tests/compile_fail/struct_size_unaligned.rs:3:1
   |
 3 | / shader_layout! {

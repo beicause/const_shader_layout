@@ -1,16 +1,29 @@
-error[E0080]: evaluation panicked: In a `shader_layout_compat!`, field `S2::a2` is not properly aligned, with uniform address layout constraints
+error[E0080]: evaluation panicked: When implementing `ShaderLayoutCompat`, field `S1::a1` size is not rounded up to a multiple of its `ALIGN_COMPAT`
   --> tests/compile_fail/struct_align_compat.rs:9:1
    |
  9 | / shader_layout_compat! {
 10 | |
-11 | |     pub struct S2 {
-12 | |         a1: f32,
+11 | |     pub struct S1 {
+12 | |         a1: Nested,
 ...  |
 15 | | }
    | |_^ evaluation of `_` failed here
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error: aborting due to 1 previous error
+error[E0080]: evaluation panicked: When implementing `ShaderLayoutCompat`, field `S2::a2` size is not rounded up to a multiple of its `ALIGN_COMPAT`
+  --> tests/compile_fail/struct_align_compat.rs:17:1
+   |
+17 | / shader_layout_compat! {
+18 | |
+19 | |     pub struct S2 {
+20 | |         a1: f32,
+...  |
+23 | | }
+   | |_^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 2 previous errors
 
 For more information about this error, try `rustc --explain E0080`.

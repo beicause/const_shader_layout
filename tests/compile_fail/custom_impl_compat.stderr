@@ -1,4 +1,4 @@
-error[E0080]: evaluation panicked: In a `shader_layout_compat!`, field `Compat::a2` is not properly aligned, with uniform address layout constraints
+error[E0080]: evaluation panicked: When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned, with uniform address layout constraints
   --> tests/compile_fail/custom_impl_compat.rs:17:1
    |
 17 | / shader_layout_compat! {
