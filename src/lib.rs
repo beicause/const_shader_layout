@@ -42,7 +42,6 @@ macro_rules! impl_shader_layout {
 /// * Array size must be equal to `N × roundUp(AlignOf(E), SizeOf(E))`.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
-#[macro_export]
 macro_rules! impl_shader_layout_array {
     ($($ty:ty),+$(,)?) => {
         $(
@@ -67,6 +66,7 @@ macro_rules! impl_shader_layout_array {
         )+
     };
 }
+pub(crate) use impl_shader_layout_array;
 
 /// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.
 ///
