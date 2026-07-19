@@ -14,7 +14,7 @@ The core of this crate is the [`shader_layout`], [`shader_layout_compat`] macros
 
 ```rust
 use const_shader_layout::{shader_layout, shader_layout_compat, ShaderLayout, ShaderLayoutCompat};
-use glam::{Vec3, Vec4};
+use glam::{Vec2, Vec3, Vec4};
 
 shader_layout! {
     pub struct MyStorage {
@@ -22,22 +22,37 @@ shader_layout! {
         a2: [f32; 2],
         a3: [f32; 1],
         a4: Vec3,
-        a5: f32
+        a5: f32,
+        a6: Vec3,
+        p1: f32, // Padding needed otherwise struct size (44) won't match shader size (48).
     }
 }
 const {
     assert!(<MyStorage as ShaderLayout>::ALIGN.get() == 16);
+    assert!(size_of::<MyStorage>() == 48);
 }
 
 shader_layout_compat! {
-    pub struct MyUniform {
+    pub struct Nersted {
         a1: [Vec4; 2],
-        a3: Vec3,
-        a4: f32
+        a2: Vec3,
+        a3: f32
+    }
+}
+shader_layout_compat! {
+    pub struct MyUniform {
+        a1: Nersted,
+        a2: Vec3,
+        // Padding is not needed, because struct size (64) aligned to 16 in `repr(C)`, so it matches shader size (64).
     }
 }
 const {
+    assert!(<Nersted as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
+    assert!(<Nersted as ShaderLayoutCompat>::SIZE_COMPAT.get() == 48);
+    assert!(size_of::<Nersted>() == 48);
     assert!(<MyUniform as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
+    assert!(<MyUniform as ShaderLayoutCompat>::SIZE_COMPAT.get() == 64);
+    assert!(size_of::<MyUniform>() == 64);
 }
 ```
 

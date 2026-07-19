@@ -1,6 +1,6 @@
 /// Marks the type's alignment requirement in shader.
 ///
-/// Note: The `size_of::<T>` must be equal to its size in shader. Thus [`bool`] should not implement this.
+/// Note: The `size_of::<Self>` must be equal to its size in shader. Thus [`bool`] should not implement this.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 pub trait ShaderLayout: Clone + Copy + 'static {
