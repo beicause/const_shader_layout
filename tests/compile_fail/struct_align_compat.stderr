@@ -1,4 +1,7 @@
-error[E0080]: evaluation panicked: When implementing `ShaderLayoutCompat`, field `S1::a1` size is not rounded up to a multiple of its `ALIGN_COMPAT`
+error[E0080]: evaluation panicked: 
+              assertion failed.
+              When implementing `ShaderLayoutCompat`, field `S1::a1` size (4) is must be a multiple of its `ALIGN_COMPAT` (16)
+              
   --> tests/compile_fail/struct_align_compat.rs:9:1
    |
  9 | / shader_layout_compat! {
@@ -7,23 +10,42 @@ error[E0080]: evaluation panicked: When implementing `ShaderLayoutCompat`, field
 12 | |         a1: Nested,
 ...  |
 15 | | }
-   | |_^ evaluation of `_` failed here
+   | |_^ evaluation of `_::_` failed here
    |
-   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: When implementing `ShaderLayoutCompat`, field `S2::a2` size is not rounded up to a multiple of its `ALIGN_COMPAT`
+error[E0080]: evaluation panicked: 
+              assertion failed.
+              When implementing `ShaderLayoutCompat`, field `S2::a2` size (4) is must be a multiple of its `ALIGN_COMPAT` (16)
+              
   --> tests/compile_fail/struct_align_compat.rs:17:1
    |
 17 | / shader_layout_compat! {
 18 | |
-19 | |     pub struct S2 {
-20 | |         a1: f32,
+19 | |
+20 | |     pub struct S2 {
 ...  |
-23 | | }
-   | |_^ evaluation of `_` failed here
+24 | | }
+   | |_^ evaluation of `_::_` failed here
    |
-   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error: aborting due to 2 previous errors
+error[E0080]: evaluation panicked: 
+              assertion failed.
+              When implementing `ShaderLayoutCompat`, field `S2::a2` is not properly aligned. Offset is 4 but required align is 16
+              
+  --> tests/compile_fail/struct_align_compat.rs:17:1
+   |
+17 | / shader_layout_compat! {
+18 | |
+19 | |
+20 | |     pub struct S2 {
+...  |
+24 | | }
+   | |_^ evaluation of `_::_` failed here
+   |
+   = note: this error originates in the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 3 previous errors
 
 For more information about this error, try `rustc --explain E0080`.

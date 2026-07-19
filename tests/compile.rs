@@ -11,7 +11,7 @@ use ui_test::{
     color_eyre::eyre::eyre,
     default_file_filter, default_per_file_config,
     dependencies::DependencyBuilder,
-    ignore_output_conflict, run_tests_generic,
+    error_on_output_conflict, run_tests_generic,
     spanned::Spanned,
     status_emitter::{Gha, StatusEmitter, Text},
 };
@@ -46,8 +46,7 @@ fn basic_config(root_dir: impl Into<PathBuf>, args: &Args) -> ui_test::Result<Co
         output_conflict_handling: if env::var_os("BLESS").is_some() {
             bless_output_files
         } else {
-            // stderr output changes between rust versions so we just rely on annotations
-            ignore_output_conflict
+            error_on_output_conflict
         },
         ..Config::rustc(root_dir)
     };

@@ -55,7 +55,7 @@ macro_rules! impl_shader_layout_compat {
 /// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.
 ///
 /// Checks at compile-time:
-/// * Array size must be equal to `N × roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`.
+/// * Array size must be equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 #[cfg_attr(
@@ -74,21 +74,19 @@ macro_rules! impl_shader_layout_array_compat {
                 const IS_ARRAY_OR_STRUCT: bool = true;
             }
 
-            // Assert array size is equal to `N × roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
+            // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
             const _: () = {
                 const N: usize = 1;
                 const SIZE: u64 = (
                     (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get())
                     .next_multiple_of(16)
                 ) * N as u64;
-                assert!(
+                const_format::assertcp!(
                     SIZE == size_of::<[$ty; N]>() as u64,
-                    concat!(
-                        "Size of `[",
+                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`",
                         stringify!($ty),
-                        "; N]` must be equal to its shader size, i.e. `N × roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`",
-                        ", with uniform address layout constraints"
-                    ),
+                        size_of::<[$ty; N]>(),
+                        SIZE,
                 );
             };
         )+
@@ -137,22 +135,23 @@ macro_rules! shader_layout_compat {
                 const MEMBER_OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
                 const MEMBER_SIZE: u64 = size_of::<$field_ty>() as u64;
 
-                assert!(
+                const_format::assertcp!(
                     (!MEMBER_IS_ARRAY_OR_STRUCT) || (MEMBER_IS_ARRAY_OR_STRUCT && MEMBER_SIZE.is_multiple_of(MEMBER_ALIGN_COMPAT)),
-                    concat!(
-                        "When implementing `ShaderLayoutCompat`, field `",
-                        stringify!($struct_name), "::", stringify!($field_name),
-                        "` size is not rounded up to a multiple of its `ALIGN_COMPAT`",
-                    ),
+                        "When implementing `ShaderLayoutCompat`, field `{}::{}` size ({}) is must be a multiple of its `ALIGN_COMPAT` ({})",
+                        stringify!($struct_name),
+                        stringify!($field_name),
+                        MEMBER_SIZE,
+                        MEMBER_ALIGN_COMPAT,
                 );
 
-                assert!(
+                const_format::assertcp!(
                     MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT),
-                    concat!(
-                        "When implementing `ShaderLayoutCompat`, field `",
-                        stringify!($struct_name), "::", stringify!($field_name),
-                        "` is not properly aligned, with uniform address layout constraints",
-                    ),
+                        "When implementing `ShaderLayoutCompat`, field `{}::{}` is not properly aligned. \
+                        Offset is {} but required align is {}",
+                        stringify!($struct_name),
+                        stringify!($field_name),
+                        MEMBER_OFFSET,
+                        MEMBER_ALIGN_COMPAT,
                 );
             };
         )*

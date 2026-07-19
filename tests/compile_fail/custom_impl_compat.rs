@@ -15,7 +15,7 @@ shader_layout! {
 }
 
 shader_layout_compat! {
-    //~^ ERROR: evaluation panicked: When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned, with uniform address layout constraints
+    //~^ ERROR: When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned. Offset is 8 but required align is 16
     pub struct Compat {
         a1: glam::Vec2,
         a2: Vec2x3Array,

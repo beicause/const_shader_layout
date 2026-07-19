@@ -33,7 +33,7 @@ macro_rules! impl_shader_layout {
 /// Implements [`ShaderLayout`] for `[T; N]` for types implemented [`ShaderLayout`].
 ///
 /// Checks at compile-time:
-/// * Array size must be equal to `N × roundUp(AlignOf(E), SizeOf(E))`.
+/// * Array size must be equal to `N * roundUp(AlignOf(E), SizeOf(E))`.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 macro_rules! impl_shader_layout_array {
@@ -44,17 +44,16 @@ macro_rules! impl_shader_layout_array {
                 const ALIGN: ::core::num::NonZero<u64> = <$ty as $crate::ShaderLayout>::ALIGN;
             }
 
-            // Assert array size is equal to `N × roundUp(AlignOf(E), SizeOf(E))`
+            // Assert array size is equal to `N * roundUp(AlignOf(E), SizeOf(E))`
             const _: () = {
                 const N: usize = 1;
                 const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64;
-                assert!(
+                const_format::assertcp!(
                     SIZE == size_of::<[$ty; N]>() as u64,
-                    concat!(
-                        "Size of `[",
+                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. `N * roundUp(AlignOf(E), SizeOf(E))`",
                         stringify!($ty),
-                        "; N]` must be equal to its shader size, i.e. `N × roundUp(AlignOf(E), SizeOf(E))`",
-                    ),
+                        size_of::<[$ty; N]>(),
+                        SIZE,
                 );
             };
         )+
@@ -94,13 +93,13 @@ macro_rules! shader_layout {
             const _: () = {
                 const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
-                assert!(
+                const_format::assertcp!(
                     OFFSET.is_multiple_of(ALIGN),
-                    concat!(
-                        "When implementing `ShaderLayout`, field `",
-                        stringify!($struct_name), "::", stringify!($field_name),
-                        "` is not properly aligned",
-                    ),
+                        "When implementing `ShaderLayout`, field `{}::{}` is not properly aligned. Offset is {} but required align is {}",
+                        stringify!($struct_name),
+                        stringify!($field_name),
+                        OFFSET,
+                        ALIGN,
                 );
             };
         )*
@@ -127,13 +126,12 @@ macro_rules! shader_layout {
         // `justPastLastMember` is equal to `size_of::<S>()` in `repr(C)`.
         const _: () = {
             const SIZE: u64 = (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get());
-            assert!(
+            const_format::assertcp!(
                 (size_of::<$struct_name>() as u64) == SIZE,
-                concat!(
-                "When implementing `ShaderLayout`, struct `",
+                "When implementing `ShaderLayout`, struct `{}` size ({}) must be equal to its shader size ({}), i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
                 stringify!($struct_name),
-                "` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
-                ),
+                size_of::<$struct_name>(),
+                SIZE,
             );
         };
     };
