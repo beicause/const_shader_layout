@@ -1,4 +1,4 @@
-use core::num::{NonZero, Wrapping};
+use core::num::NonZero;
 
 use crate::ShaderLayout;
 
@@ -12,16 +12,29 @@ pub trait ShaderLayoutCompat: ShaderLayout {
     const ALIGN_COMPAT: NonZero<u64> = Self::ALIGN;
 }
 
-/// Implements [`ShaderLayoutCompat`] for the types, with their original alignment and size.
+/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with their original alignment.
 #[macro_export]
 macro_rules! impl_shader_layout_compat_raw {
     ($($ty:ty),+$(,)?) => {
-        $(impl $crate::ShaderLayoutCompat for $ty {
-        })+
+        $(
+            $crate::impl_shader_layout_raw!($ty);
+            impl $crate::ShaderLayoutCompat for $ty {}
+        )+
     };
 }
 
-/// Implements [`ShaderLayoutCompat`] for `[T; N]` for types implemented [`ShaderLayoutCompat`].
+/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with the specified alignment.
+#[macro_export]
+macro_rules! impl_shader_layout_compat {
+    ($align:expr $(, $ty:ty)+$(,)?) => {
+        $(
+            $crate::impl_shader_layout!($align, $ty);
+            impl $crate::ShaderLayoutCompat for $ty {}
+        )+
+    };
+}
+
+/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for `[T; N]` for types implemented [`ShaderLayoutCompat`].
 ///
 /// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.
 ///
@@ -30,9 +43,10 @@ macro_rules! impl_shader_layout_compat_raw {
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 #[macro_export]
-macro_rules! impl_shader_layout_compat_array {
+macro_rules! impl_shader_layout_array_compat {
     ($($ty:ty),+$(,)?) => {
         $(
+            $crate::impl_shader_layout_array!($ty);
             impl<const N: usize> $crate::ShaderLayoutCompat for [$ty; N]
             {
                 const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
@@ -125,21 +139,3 @@ macro_rules! shader_layout_compat {
         }
     };
 }
-
-// Scalar
-impl_shader_layout_compat_raw!(
-    i16,
-    u16,
-    NonZero<i16>,
-    NonZero<u16>,
-    Wrapping<i16>,
-    Wrapping<u16>,
-    f32,
-    i32,
-    u32,
-    NonZero<i32>,
-    NonZero<u32>,
-    Wrapping<f32>,
-    Wrapping<i32>,
-    Wrapping<u32>,
-);

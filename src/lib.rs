@@ -14,7 +14,7 @@ pub trait ShaderLayout: Clone + Copy + 'static {
     const ALIGN: NonZero<u64>;
 }
 
-/// Implements [`ShaderLayout`] for the types, with their original alignment and size.
+/// Implements [`ShaderLayout`] for the types, with their original alignment.
 #[macro_export]
 macro_rules! impl_shader_layout_raw {
     ($($ty:ty),+$(,)?) => {
@@ -24,13 +24,15 @@ macro_rules! impl_shader_layout_raw {
     };
 }
 
-/// Implements [`ShaderLayout`] for the types, with the specified alignment and size.
+/// Implements [`ShaderLayout`] for the types, with the specified alignment.
 #[macro_export]
 macro_rules! impl_shader_layout {
     ($align:expr $(, $ty:ty)+$(,)?) => {
-        $(impl $crate::ShaderLayout for $ty {
-            const ALIGN: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align).unwrap();
-        })+
+        $(
+            impl $crate::ShaderLayout for $ty {
+                const ALIGN: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align).unwrap();
+            }
+        )+
     };
 }
 
@@ -65,42 +67,6 @@ macro_rules! impl_shader_layout_array {
         )+
     };
 }
-
-// Scalar
-impl_shader_layout_raw!(
-    i16,
-    u16,
-    NonZero<i16>,
-    NonZero<u16>,
-    Wrapping<i16>,
-    Wrapping<u16>,
-    f32,
-    i32,
-    u32,
-    NonZero<i32>,
-    NonZero<u32>,
-    Wrapping<f32>,
-    Wrapping<i32>,
-    Wrapping<u32>,
-);
-
-// Array
-impl_shader_layout_array!(
-    i16,
-    u16,
-    NonZero<i16>,
-    NonZero<u16>,
-    Wrapping<i16>,
-    Wrapping<u16>,
-    f32,
-    i32,
-    u32,
-    NonZero<i32>,
-    NonZero<u32>,
-    Wrapping<f32>,
-    Wrapping<i32>,
-    Wrapping<u32>,
-);
 
 /// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.
 ///
@@ -181,6 +147,42 @@ macro_rules! shader_layout {
 
 mod compat;
 pub use compat::*;
+
+// Scalar
+impl_shader_layout_compat_raw!(
+    i16,
+    u16,
+    NonZero<i16>,
+    NonZero<u16>,
+    Wrapping<i16>,
+    Wrapping<u16>,
+    f32,
+    i32,
+    u32,
+    NonZero<i32>,
+    NonZero<u32>,
+    Wrapping<f32>,
+    Wrapping<i32>,
+    Wrapping<u32>,
+);
+
+// Array
+impl_shader_layout_array!(
+    i16,
+    u16,
+    NonZero<i16>,
+    NonZero<u16>,
+    Wrapping<i16>,
+    Wrapping<u16>,
+    f32,
+    i32,
+    u32,
+    NonZero<i32>,
+    NonZero<u32>,
+    Wrapping<f32>,
+    Wrapping<i32>,
+    Wrapping<u32>,
+);
 
 #[cfg(feature = "glam")]
 #[cfg_attr(docsrs, doc(cfg(feature = "glam")))]
