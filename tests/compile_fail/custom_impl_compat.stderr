@@ -1,0 +1,12 @@
+error[E0080]: evaluation panicked: In a `shader_layout_compat!`, field `Compat::a2` is not properly aligned, with uniform address layout constraints
+  --> tests/compile_fail/custom_impl_compat.rs:17:1
+   |
+17 | / shader_layout_compat! {
+18 | |     pub struct Compat {
+19 | |         a1: glam::Vec2,
+20 | |         a2: Vec2x3Array,
+...  |
+24 | | }
+   | |_^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)

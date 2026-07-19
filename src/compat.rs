@@ -2,13 +2,13 @@ use core::num::NonZero;
 
 use crate::ShaderLayout;
 
-/// Marks the type's uniform-compatible alignment requirement in shader.
+/// Marks the type's uniform-compatible alignment requirement in shader, i.e. with uniform address layout constraints.
 ///
 /// Note: The `size_of::<T>` must be equal to its size in shader. Thus [`bool`] should not implement this.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 pub trait ShaderLayoutCompat: ShaderLayout {
-    /// The type's alignment requirement in shader.
+    /// The type's alignment requirement with uniform address layout constraints in shader.
     const ALIGN_COMPAT: NonZero<u64> = Self::ALIGN;
 }
 
@@ -30,6 +30,14 @@ macro_rules! impl_shader_layout_compat {
         $(
             $crate::impl_shader_layout!($align, $ty);
             impl $crate::ShaderLayoutCompat for $ty {}
+        )+
+    };
+    ($align:expr, $align_compat:expr $(, $ty:ty)+$(,)?) => {
+        $(
+            $crate::impl_shader_layout!($align, $ty);
+            impl $crate::ShaderLayoutCompat for $ty {
+                const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align_compat).unwrap();
+            }
         )+
     };
 }
