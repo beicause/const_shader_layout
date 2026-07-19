@@ -8,7 +8,7 @@
 
 The core of this crate is the [`shader_layout`] macro and the [`ShaderLayout`] trait.
 ```rust
-use const_shader_layout::shader_layout;
+use const_shader_layout::{shader_layout, ShaderLayout};
 use glam::Vec3;
 
 shader_layout! {
@@ -20,8 +20,13 @@ shader_layout! {
         a5: f32
     }
 }
+const {
+    assert!(<MyUniform as ShaderLayout>::ALIGN.get() == 16);
+}
 ```
 
 See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what this supports and checks.
+
+This doesn't provide any byte conversion methods. Instead, it's intended to be used with other libraries such as [bytemuck](https://docs.rs/bytemuck/latest/bytemuck/index.html).
 
 Note: [Uniform address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) is not checked yet.

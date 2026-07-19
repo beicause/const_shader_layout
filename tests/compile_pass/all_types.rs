@@ -6,7 +6,7 @@ use glam::{
 };
 
 shader_layout! {
-    pub struct MyUniform {
+    pub struct AllTypes {
         a1: half::f16,
         a2: i16,
         a3: u16,

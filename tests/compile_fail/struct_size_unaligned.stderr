@@ -1,8 +1,8 @@
-error[E0080]: evaluation panicked: In a `shader_layout!`, struct `MyUniform` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`
+error[E0080]: evaluation panicked: In a `shader_layout!`, struct `SizeUnaligned` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`
  --> tests/compile_fail/struct_size_unaligned.rs:3:1
   |
 3 | / shader_layout! {
-4 | |     pub struct MyUniform {
+4 | |     pub struct SizeUnaligned {
 5 | |         a4: glam::Vec3,
 6 | |     }
 7 | | }
