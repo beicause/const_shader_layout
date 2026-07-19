@@ -1,5 +1,3 @@
-use core::num::NonZero;
-
 use crate::ShaderLayout;
 
 /// Marks the type's uniform-compatible alignment requirement in shader, i.e. with uniform address layout constraints.
@@ -9,7 +7,7 @@ use crate::ShaderLayout;
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 pub trait ShaderLayoutCompat: ShaderLayout {
     /// The type's alignment requirement with uniform address layout constraints in shader.
-    const ALIGN_COMPAT: NonZero<u64> = Self::ALIGN;
+    const ALIGN_COMPAT: core::num::NonZero<u64> = Self::ALIGN;
 }
 
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with their original alignment.

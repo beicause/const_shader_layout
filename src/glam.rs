@@ -4,7 +4,7 @@ use glam::{
     U16Vec4, UVec2, UVec3, UVec4, Vec2, Vec3, Vec4,
 };
 
-use crate::{impl_shader_layout_array_compat, impl_shader_layout_compat};
+use crate::{impl_shader_layout_array, impl_shader_layout_array_compat, impl_shader_layout_compat};
 
 // Vector
 impl_shader_layout_compat!(4, I16Vec2, U16Vec2);
