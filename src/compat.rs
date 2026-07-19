@@ -7,8 +7,12 @@ use crate::ShaderLayout;
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 pub trait ShaderLayoutCompat: ShaderLayout {
     /// The type's alignment requirement with uniform address layout constraints in shader.
+    /// If the type is not constrained, it should be [`ShaderLayout::ALIGN`].
     const ALIGN_COMPAT: core::num::NonZero<u64> = Self::ALIGN;
-    const IS_ARRAY_OR_STRUCT: bool = false;
+    /// The type's size requirement with uniform address layout constraints in shader.
+    /// If the type is not constrained, it should be `size_of::<Self>()`.
+    const SIZE_COMPAT: core::num::NonZero<u64> =
+        core::num::NonZero::new(size_of::<Self>() as u64).unwrap();
 }
 
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the primitive types, with their original alignment.
@@ -41,12 +45,15 @@ macro_rules! impl_shader_layout_compat {
             }
         )+
     };
-    ($align:expr, $align_compat:expr, $is_array_or_struct:expr $(, $ty:ty)+$(,)?) => {
+    ($align:expr, $align_compat:expr, $size_compat:expr $(, $ty:ty)+$(,)?) => {
+        const _: () ={
+            assert!((($size_compat) as u64).is_multiple_of(16u64));
+        };
         $(
             $crate::impl_shader_layout!($align, $ty);
             impl $crate::ShaderLayoutCompat for $ty {
                 const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align_compat).unwrap();
-                const IS_ARRAY_OR_STRUCT: bool = $is_array_or_struct;
+                const SIZE_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new($size_compat).unwrap();
             }
         )+
     };
@@ -69,18 +76,17 @@ macro_rules! impl_shader_layout_array_compat {
             impl<const N: usize> $crate::ShaderLayoutCompat for [$ty; N]
             {
                 const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                    <$ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get().next_multiple_of(16)
+                    <$ty as $crate::ShaderLayout>::ALIGN.get().next_multiple_of(16)
                 ).unwrap();
-                const IS_ARRAY_OR_STRUCT: bool = true;
+                const SIZE_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
+                    (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()).next_multiple_of(16) * N as u64
+                ).unwrap();
             }
 
             // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
             const _: () = {
                 const N: usize = 1;
-                const SIZE: u64 = (
-                    (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get())
-                    .next_multiple_of(16)
-                ) * N as u64;
+                const SIZE: u64 = <[$ty; N] as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
                 const_format::assertcp!(
                     SIZE == size_of::<[$ty; N]>() as u64,
                         "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`",
@@ -126,23 +132,23 @@ macro_rules! shader_layout_compat {
         $(
             const _: () = {
                 const MEMBER_ALIGN_COMPAT: u64 = <$field_ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get();
-                const MEMBER_IS_ARRAY_OR_STRUCT: bool = <$field_ty as $crate::ShaderLayoutCompat>::IS_ARRAY_OR_STRUCT;
-                const MEMBER_OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
+                const MEMBER_SIZE_COMPAT: u64 = <$field_ty as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
                 const MEMBER_SIZE: u64 = size_of::<$field_ty>() as u64;
+                const MEMBER_OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
 
                 const_format::assertcp!(
-                    (!MEMBER_IS_ARRAY_OR_STRUCT) || (MEMBER_IS_ARRAY_OR_STRUCT && MEMBER_SIZE.is_multiple_of(MEMBER_ALIGN_COMPAT)),
-                        "When implementing `ShaderLayoutCompat`, field `{}::{}` size ({}) is must be a multiple of its `ALIGN_COMPAT` ({})",
+                    MEMBER_SIZE == MEMBER_SIZE_COMPAT,
+                        "When implementing `ShaderLayoutCompat`, field `{}::{}` has uniform layout constraints thus its size ({}) must be {}",
                         stringify!($struct_name),
                         stringify!($field_name),
                         MEMBER_SIZE,
-                        MEMBER_ALIGN_COMPAT,
+                        MEMBER_SIZE_COMPAT,
                 );
 
                 const_format::assertcp!(
                     MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT),
                         "When implementing `ShaderLayoutCompat`, field `{}::{}` is not properly aligned. \
-                        Offset is {} but required align is {}",
+                        The offset is {} but required align is {}",
                         stringify!($struct_name),
                         stringify!($field_name),
                         MEMBER_OFFSET,
@@ -167,7 +173,19 @@ macro_rules! shader_layout_compat {
                 }
                 ::core::num::NonZero::new(max.next_multiple_of(16)).unwrap()
             };
-            const IS_ARRAY_OR_STRUCT: bool = true;
+            const SIZE_COMPAT: ::core::num::NonZero<u64> = {
+                const MEMBER_SIZES: &[u64] = &[$(
+                    (<$field_ty as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get())
+                ),*];
+
+                let mut sum = MEMBER_SIZES[0];
+                let mut i = 1;
+                while i < MEMBER_SIZES.len() {
+                    sum += MEMBER_SIZES[i];
+                    i += 1;
+                }
+                ::core::num::NonZero::new(sum.next_multiple_of(16)).unwrap()
+            };
         }
     };
 }

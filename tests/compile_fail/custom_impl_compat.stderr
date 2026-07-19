@@ -1,7 +1,7 @@
-error[E0080]: evaluation panicked: 
+error[E0080]: evaluation panicked:
               assertion failed.
-              When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned. Offset is 8 but required align is 16
-              
+              When implementing `ShaderLayoutCompat`, field `Compat::a2` is not properly aligned. The offset is 8 but required align is 16
+
   --> tests/compile_fail/custom_impl_compat.rs:17:1
    |
 17 | / shader_layout_compat! {

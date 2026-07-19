@@ -98,7 +98,7 @@ macro_rules! shader_layout {
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 const_format::assertcp!(
                     OFFSET.is_multiple_of(ALIGN),
-                        "When implementing `ShaderLayout`, field `{}::{}` is not properly aligned. Offset is {} but required align is {}",
+                        "When implementing `ShaderLayout`, field `{}::{}` is not properly aligned. The offset is {} but required align is {}",
                         stringify!($struct_name),
                         stringify!($field_name),
                         OFFSET,
