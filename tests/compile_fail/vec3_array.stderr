@@ -9,10 +9,10 @@ error[E0277]: the trait bound `[Vec3; 1]: ShaderLayout` is not satisfied
             [I16Vec4; N]
             [IVec2; N]
             [IVec4; N]
+            [Mat2; N]
+            [Mat3A; N]
+            [Mat4; N]
             [NonZero<i16>; N]
-            [NonZero<i32>; N]
-            [NonZero<u16>; N]
-            [NonZero<u32>; N]
           and $N others
 
 error[E0277]: the trait bound `[IVec3; 1]: ShaderLayout` is not satisfied
@@ -26,10 +26,10 @@ error[E0277]: the trait bound `[IVec3; 1]: ShaderLayout` is not satisfied
              [I16Vec4; N]
              [IVec2; N]
              [IVec4; N]
+             [Mat2; N]
+             [Mat3A; N]
+             [Mat4; N]
              [NonZero<i16>; N]
-             [NonZero<i32>; N]
-             [NonZero<u16>; N]
-             [NonZero<u32>; N]
            and $N others
 
 error[E0277]: the trait bound `[UVec3; 1]: ShaderLayout` is not satisfied
@@ -43,8 +43,8 @@ error[E0277]: the trait bound `[UVec3; 1]: ShaderLayout` is not satisfied
              [I16Vec4; N]
              [IVec2; N]
              [IVec4; N]
+             [Mat2; N]
+             [Mat3A; N]
+             [Mat4; N]
              [NonZero<i16>; N]
-             [NonZero<i32>; N]
-             [NonZero<u16>; N]
-             [NonZero<u32>; N]
            and $N others

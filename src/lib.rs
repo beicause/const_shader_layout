@@ -3,12 +3,6 @@
 #![no_std]
 
 use core::num::{NonZero, Wrapping};
-#[cfg(feature = "glam")]
-#[cfg_attr(docsrs, doc(cfg(feature = "glam")))]
-mod glam;
-#[cfg(feature = "half")]
-#[cfg_attr(docsrs, doc(cfg(feature = "half")))]
-mod half;
 
 /// Marks the type's alignment requirement in shader.
 ///
@@ -182,3 +176,10 @@ macro_rules! shader_layout {
         };
     };
 }
+
+#[cfg(feature = "glam")]
+#[cfg_attr(docsrs, doc(cfg(feature = "glam")))]
+mod glam;
+#[cfg(feature = "half")]
+#[cfg_attr(docsrs, doc(cfg(feature = "half")))]
+mod half;
