@@ -13,6 +13,7 @@ pub trait ShaderLayoutCompat: ShaderLayout {
 
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the primitive types, with their original alignment.
 #[macro_export]
+#[doc(hidden)]
 macro_rules! impl_shader_layout_compat_primitive {
     ($($ty:ty),+$(,)?) => {
         $(
@@ -24,6 +25,7 @@ macro_rules! impl_shader_layout_compat_primitive {
 
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with the specified alignment.
 #[macro_export]
+#[doc(hidden)]
 macro_rules! impl_shader_layout_compat {
     ($align:expr $(, $ty:ty)+$(,)?) => {
         $(
@@ -58,10 +60,8 @@ macro_rules! impl_shader_layout_compat {
 /// * Array size must be equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
-#[cfg_attr(
-    not(feature = "glam"),
-    expect(unused_macros, reason = "unused without some features")
-)]
+#[macro_export]
+#[doc(hidden)]
 macro_rules! impl_shader_layout_array_compat {
     ($($ty:ty),+$(,)?) => {
         $(
@@ -92,11 +92,6 @@ macro_rules! impl_shader_layout_array_compat {
         )+
     };
 }
-#[cfg_attr(
-    not(feature = "glam"),
-    expect(unused_imports, reason = "unused without some features")
-)]
-pub(crate) use impl_shader_layout_array_compat;
 
 /// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayoutCompat`] for this struct, or fails at compile-time.
 ///

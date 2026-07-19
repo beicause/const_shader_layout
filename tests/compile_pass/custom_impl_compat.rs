@@ -10,18 +10,18 @@ impl_shader_layout_compat!(16, 16, Vec3);
 impl_shader_layout_compat!(8, Vec2);
 
 #[derive(Clone, Copy)]
-pub struct Vec2x3Array(pub [Vec2; 3]);
+pub struct Vec2ArrayLen3(pub [Vec2; 3]);
 
 #[derive(Clone, Copy)]
-pub struct Vec2x4Array(pub [Vec2; 4]);
+pub struct Vec4ArrayLen2(pub [Vec2; 4]);
 
-impl_shader_layout_compat!(8, 16, false, Vec2x3Array);
-impl_shader_layout_compat!(8, 16, false, Vec2x4Array);
+impl_shader_layout_compat!(8, 16, true, Vec2ArrayLen3);
+impl_shader_layout_compat!(8, 16, true, Vec4ArrayLen2);
 
 shader_layout! {
     pub struct S {
         a1: Vec2,
-        a2: Vec2x3Array,
+        a2: Vec2ArrayLen3,
         a3: Vec3,
         p1: f32,
     }
@@ -31,7 +31,7 @@ shader_layout_compat! {
     pub struct Compat {
         a1: Vec2,
         p1: Vec2,
-        a2: Vec2x4Array,
+        a2: Vec4ArrayLen2,
         p2: Vec2,
         p3: Vec2,
         a3: Vec3,

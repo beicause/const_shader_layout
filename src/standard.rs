@@ -10,6 +10,7 @@ pub trait ShaderLayout: Clone + Copy + 'static {
 
 /// Implements [`ShaderLayout`] for the primitive types, with their original alignment.
 #[macro_export]
+#[doc(hidden)]
 macro_rules! impl_shader_layout_primitive {
     ($($ty:ty),+$(,)?) => {
         $(impl $crate::ShaderLayout for $ty {
@@ -20,6 +21,7 @@ macro_rules! impl_shader_layout_primitive {
 
 /// Implements [`ShaderLayout`] for the types, with the specified alignment.
 #[macro_export]
+#[doc(hidden)]
 macro_rules! impl_shader_layout {
     ($align:expr $(, $ty:ty)+$(,)?) => {
         $(
@@ -36,6 +38,8 @@ macro_rules! impl_shader_layout {
 /// * Array size must be equal to `N * roundUp(AlignOf(E), SizeOf(E))`.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
+#[macro_export]
+#[doc(hidden)]
 macro_rules! impl_shader_layout_array {
     ($($ty:ty),+$(,)?) => {
         $(
@@ -59,7 +63,6 @@ macro_rules! impl_shader_layout_array {
         )+
     };
 }
-pub(crate) use impl_shader_layout_array;
 
 /// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.
 ///
