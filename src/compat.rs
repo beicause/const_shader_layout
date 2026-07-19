@@ -8,14 +8,15 @@ use crate::ShaderLayout;
 pub trait ShaderLayoutCompat: ShaderLayout {
     /// The type's alignment requirement with uniform address layout constraints in shader.
     const ALIGN_COMPAT: core::num::NonZero<u64> = Self::ALIGN;
+    const IS_ARRAY_OR_STRUCT: bool = false;
 }
 
-/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with their original alignment.
+/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the primitive types, with their original alignment.
 #[macro_export]
-macro_rules! impl_shader_layout_compat_raw {
+macro_rules! impl_shader_layout_compat_primitive {
     ($($ty:ty),+$(,)?) => {
         $(
-            $crate::impl_shader_layout_raw!($ty);
+            $crate::impl_shader_layout_primitive!($ty);
             impl $crate::ShaderLayoutCompat for $ty {}
         )+
     };
@@ -35,6 +36,15 @@ macro_rules! impl_shader_layout_compat {
             $crate::impl_shader_layout!($align, $ty);
             impl $crate::ShaderLayoutCompat for $ty {
                 const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align_compat).unwrap();
+            }
+        )+
+    };
+    ($align:expr, $align_compat:expr, $is_array_or_struct:expr $(, $ty:ty)+$(,)?) => {
+        $(
+            $crate::impl_shader_layout!($align, $ty);
+            impl $crate::ShaderLayoutCompat for $ty {
+                const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new($align_compat).unwrap();
+                const IS_ARRAY_OR_STRUCT: bool = $is_array_or_struct;
             }
         )+
     };
@@ -61,10 +71,11 @@ macro_rules! impl_shader_layout_array_compat {
                 const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
                     <$ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get().next_multiple_of(16)
                 ).unwrap();
+                const IS_ARRAY_OR_STRUCT: bool = true;
             }
 
             // Assert array size is equal to `N × roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
-            const _ : () = {
+            const _: () = {
                 const N: usize = 1;
                 const SIZE: u64 = (
                     (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get())
@@ -120,13 +131,25 @@ macro_rules! shader_layout_compat {
         );
 
         $(
-            const _ : () = {
-                const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
-                const ALIGN_COMPAT: u64 = <$field_ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get();
+            const _: () = {
+                const MEMBER_ALIGN_COMPAT: u64 = <$field_ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get();
+                const MEMBER_IS_ARRAY_OR_STRUCT: bool = <$field_ty as $crate::ShaderLayoutCompat>::IS_ARRAY_OR_STRUCT;
+                const MEMBER_OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
+                const MEMBER_SIZE: u64 = size_of::<$field_ty>() as u64;
+
                 assert!(
-                    OFFSET.is_multiple_of(ALIGN_COMPAT),
+                    (!MEMBER_IS_ARRAY_OR_STRUCT) || (MEMBER_IS_ARRAY_OR_STRUCT && MEMBER_SIZE.is_multiple_of(MEMBER_ALIGN_COMPAT)),
                     concat!(
-                        "In a `shader_layout_compat!`, field `",
+                        "When implementing `ShaderLayoutCompat`, field `",
+                        stringify!($struct_name), "::", stringify!($field_name),
+                        "` size is not rounded up to a multiple of its `ALIGN_COMPAT`",
+                    ),
+                );
+
+                assert!(
+                    MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT),
+                    concat!(
+                        "When implementing `ShaderLayoutCompat`, field `",
                         stringify!($struct_name), "::", stringify!($field_name),
                         "` is not properly aligned, with uniform address layout constraints",
                     ),
@@ -150,6 +173,7 @@ macro_rules! shader_layout_compat {
                 }
                 ::core::num::NonZero::new(max.next_multiple_of(16)).unwrap()
             };
+            const IS_ARRAY_OR_STRUCT: bool = true;
         }
     };
 }

@@ -1,9 +1,9 @@
 use core::num::{NonZero, Wrapping};
 
-use crate::{impl_shader_layout_array, impl_shader_layout_compat_raw};
+use crate::{impl_shader_layout_array, impl_shader_layout_compat_primitive};
 
 // Scalar
-impl_shader_layout_compat_raw!(
+impl_shader_layout_compat_primitive!(
     i16,
     u16,
     NonZero<i16>,

@@ -8,9 +8,9 @@ pub trait ShaderLayout: Clone + Copy + 'static {
     const ALIGN: core::num::NonZero<u64>;
 }
 
-/// Implements [`ShaderLayout`] for the types, with their original alignment.
+/// Implements [`ShaderLayout`] for the primitive types, with their original alignment.
 #[macro_export]
-macro_rules! impl_shader_layout_raw {
+macro_rules! impl_shader_layout_primitive {
     ($($ty:ty),+$(,)?) => {
         $(impl $crate::ShaderLayout for $ty {
             const ALIGN: ::core::num::NonZero<u64> = ::core::num::NonZero::new(align_of::<$ty>() as u64).unwrap();
@@ -45,7 +45,7 @@ macro_rules! impl_shader_layout_array {
             }
 
             // Assert array size is equal to `N × roundUp(AlignOf(E), SizeOf(E))`
-            const _ : () = {
+            const _: () = {
                 const N: usize = 1;
                 const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64;
                 assert!(
@@ -91,13 +91,13 @@ macro_rules! shader_layout {
         }
 
         $(
-            const _ : () = {
+            const _: () = {
                 const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 assert!(
                     OFFSET.is_multiple_of(ALIGN),
                     concat!(
-                        "In a `shader_layout!`, field `",
+                        "When implementing `ShaderLayout`, field `",
                         stringify!($struct_name), "::", stringify!($field_name),
                         "` is not properly aligned",
                     ),
@@ -125,12 +125,12 @@ macro_rules! shader_layout {
 
         // Assert struct has no padding, i.e. size must be equal to `roundUp(AlignOf(S), justPastLastMember))`
         // `justPastLastMember` is equal to `size_of::<S>()` in `repr(C)`.
-        const _ : () = {
+        const _: () = {
             const SIZE: u64 = (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get());
             assert!(
                 (size_of::<$struct_name>() as u64) == SIZE,
                 concat!(
-                "In a `shader_layout!`, struct `",
+                "When implementing `ShaderLayout`, struct `",
                 stringify!($struct_name),
                 "` size must be equal to its shader size, i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
                 ),
