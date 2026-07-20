@@ -5,12 +5,31 @@
 [![Cargo](https://img.shields.io/crates/v/const_shader_layout.svg)](https://crates.io/crates/const_shader_layout)
 [![Documentation](https://docs.rs/const_shader_layout/badge.svg)](https://docs.rs/const_shader_layout)
 
+All validation is performed at compile time using **declarative macros** (`macro_rules!`) — no proc macros,
+no build dependencies, no compile-time overhead beyond the checks themselves.
 
-The core of this crate is the [`shader_layout`], [`shader_layout_compat`] macros and the [`ShaderLayout`], [`ShaderLayoutCompat`] traits.
+The core of this crate is the [`shader_layout`], [`shader_layout_compat`] macros and the
+[`ShaderLayout`], [`ShaderLayoutCompat`] traits.
 
-`ShaderLayout` is corresponding to <https://www.w3.org/TR/WGSL/#alignment-and-size>.
+`ShaderLayout` corresponds to <https://www.w3.org/TR/WGSL/#alignment-and-size>.
 
-`ShaderLayoutCompat` is a subset of `ShaderLayout` and is corresponding to [address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints) of uniform without [uniform_buffer_standard_layout](https://www.w3.org/TR/WGSL/#language_extension-uniform_buffer_standard_layout) language extension.
+`ShaderLayoutCompat` is a stricter subset that enforces the
+[uniform address space layout constraints](https://www.w3.org/TR/WGSL/#address-space-layout-constraints)
+(without the `uniform_buffer_standard_layout` extension). Every type implementing `ShaderLayoutCompat`
+also implements `ShaderLayout`.
+
+Both macros validate every field's alignment and the overall struct size at compile time. If a constraint
+is violated, compilation fails with a clear error message:
+
+```text
+shader_layout! {
+    pub struct OffsetUnaligned {
+        a1: f32,        // align 4
+        a4: glam::Vec3, // align 16 — offset 4 is not a multiple of 16!
+    }
+}
+// error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: field `OffsetUnaligned::a4` (`glam::Vec3`) is not properly aligned. The offset is 4 but required align is 16
+```
 
 ```rust
 use const_shader_layout::{shader_layout, shader_layout_compat, ShaderLayout, ShaderLayoutCompat};
@@ -27,10 +46,6 @@ shader_layout! {
         p1: f32, // Padding needed otherwise struct size (44) won't match shader size (48).
     }
 }
-const {
-    assert!(<MyStorage as ShaderLayout>::ALIGN.get() == 16);
-    assert!(size_of::<MyStorage>() == 48);
-}
 
 shader_layout_compat! {
     pub struct Nested {
@@ -39,6 +54,7 @@ shader_layout_compat! {
         a3: f32
     }
 }
+
 shader_layout_compat! {
     pub struct MyUniform {
         a1: Nested,
@@ -46,16 +62,16 @@ shader_layout_compat! {
         // Padding is implicit, because struct size is 64 aligned to 16 in `repr(C)` which matches shader size (64).
     }
 }
-const {
-    assert!(<Nested as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
-    assert!(<Nested as ShaderLayoutCompat>::SIZE_COMPAT.get() == 48);
-    assert!(size_of::<Nested>() == 48);
-    assert!(<MyUniform as ShaderLayoutCompat>::ALIGN_COMPAT.get() == 16);
-    assert!(<MyUniform as ShaderLayoutCompat>::SIZE_COMPAT.get() == 64);
-    assert!(size_of::<MyUniform>() == 64);
-}
 ```
 
 See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what this supports and checks.
 
-This doesn't provide any byte conversion methods. Instead, it's intended to be used with other libraries such as [bytemuck](https://docs.rs/bytemuck/latest/bytemuck/index.html).
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| `glam` (default) | Implements `ShaderLayout`/`ShaderLayoutCompat` for `glam` types |
+| `half` | Implements `ShaderLayout`/`ShaderLayoutCompat` for `half::f16` and array of it |
+| `std` (default), `libm`, `nostd-libm` | Re-export `glam`'s corresponding features |
+
+This crate focuses on layout validation only. For safe cast/transmute utilities, pair it with other crates like [bytemuck](https://docs.rs/bytemuck/).

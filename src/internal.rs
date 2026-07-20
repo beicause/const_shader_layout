@@ -5,6 +5,7 @@ pub struct MsgBuf<const N: usize> {
 }
 
 impl<const N: usize> MsgBuf<N> {
+    #[expect(clippy::new_without_default, reason = "Default::default() is not const fn, unusable in const blocks")]
     pub const fn new() -> Self {
         Self {
             buf: [0u8; N],
