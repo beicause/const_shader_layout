@@ -59,6 +59,45 @@ macro_rules! impl_shader_layout_compat {
     };
 }
 
+/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for a custom array type for elements implemented [`ShaderLayoutCompat`].
+///
+/// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.
+///
+/// Checks at compile-time:
+/// * Array size must be equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
+#[macro_export]
+#[doc(hidden)]
+macro_rules! impl_shader_layout_custom_array_compat {
+    ($elem_ty:ty, $array_ty:ty, $n:expr) => {
+        $crate::impl_shader_layout_custom_array!($elem_ty, $array_ty, $n);
+        impl $crate::ShaderLayoutCompat for $array_ty
+        {
+            const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
+                <$elem_ty as $crate::ShaderLayout>::ALIGN.get().next_multiple_of(16)
+            ).unwrap();
+            const SIZE_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
+                (size_of::<$elem_ty>() as u64).next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get()).next_multiple_of(16) * $n as u64
+            ).unwrap();
+        }
+
+        // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
+        const _: () = {
+            const N: usize = $n;
+            const SIZE: u64 = <$array_ty as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
+            const_format::assertcp!(
+                SIZE == size_of::<$array_ty>() as u64,
+                    "Failed to implement `ShaderLayoutCompat`: array `{}` size ({}) must be equal to its shader size ({}), i.e. the stride must be rounded up to `ALIGN` ({}) and 16",
+                    stringify!($array_ty),
+                    size_of::<$array_ty>(),
+                    SIZE,
+                    <$elem_ty as $crate::ShaderLayout>::ALIGN.get(),
+            );
+        };
+    };
+}
+
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for `[T; N]` for types implemented [`ShaderLayoutCompat`].
 ///
 /// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.

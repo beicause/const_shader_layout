@@ -32,6 +32,37 @@ macro_rules! impl_shader_layout {
     };
 }
 
+/// Implements [`ShaderLayout`] for a custom array type for elements implemented [`ShaderLayout`].
+///
+/// Checks at compile-time:
+/// * Array size must be equal to `N * roundUp(AlignOf(E), SizeOf(E))`.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
+#[macro_export]
+#[doc(hidden)]
+macro_rules! impl_shader_layout_custom_array {
+    ($elem_ty:ty, $array_ty:ty, $n:expr) => {
+        impl $crate::ShaderLayout for $array_ty
+        {
+            const ALIGN: ::core::num::NonZero<u64> = <$elem_ty as $crate::ShaderLayout>::ALIGN;
+        }
+
+        // Assert array size is equal to `N * roundUp(AlignOf(E), SizeOf(E))`
+        const _: () = {
+            const N: usize = $n;
+            const SIZE: u64 = (size_of::<$elem_ty>() as u64).next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64;
+            const_format::assertcp!(
+                SIZE == size_of::<$array_ty>() as u64,
+                    "Failed to implement `ShaderLayout`: array `{}` size ({}) must be equal to its shader size ({}), i.e. the stride must be rounded up to `ALIGN` ({})",
+                    stringify!($array_ty),
+                    size_of::<$array_ty>(),
+                    SIZE,
+                    <$elem_ty as $crate::ShaderLayout>::ALIGN.get(),
+            );
+        };
+    };
+}
+
 /// Implements [`ShaderLayout`] for `[T; N]` for types implemented [`ShaderLayout`].
 ///
 /// Checks at compile-time:

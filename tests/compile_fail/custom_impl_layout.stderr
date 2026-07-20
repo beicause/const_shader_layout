@@ -2,7 +2,7 @@ error[E0080]: evaluation panicked:
               assertion failed.
               Failed to impl `ShaderLayoutCompat`: field `Compat::a2` (`Vec2ArrayLen3`) size (24) must be `SIZE_COMPAT` (48) due to uniform layout constraints
               
-  --> tests/compile_fail/custom_impl_compat.rs:17:1
+  --> tests/compile_fail/custom_impl_layout.rs:17:1
    |
 17 | / shader_layout_compat! {
 18 | |
@@ -18,7 +18,7 @@ error[E0080]: evaluation panicked:
               assertion failed.
               Failed to impl `ShaderLayoutCompat`: field `Compat::a2` (`Vec2ArrayLen3`) is not properly aligned. The offset is 8 but required align is `ALIGN_COMPAT` (16)
               
-  --> tests/compile_fail/custom_impl_compat.rs:17:1
+  --> tests/compile_fail/custom_impl_layout.rs:17:1
    |
 17 | / shader_layout_compat! {
 18 | |
