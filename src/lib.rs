@@ -2,6 +2,9 @@
 #![cfg_attr(docsrs, feature(doc_cfg), doc(auto_cfg = false))]
 #![no_std]
 
+#[doc(hidden)]
+pub mod internal;
+
 mod standard;
 pub use standard::*;
 mod compat;

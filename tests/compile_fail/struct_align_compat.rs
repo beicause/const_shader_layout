@@ -16,7 +16,6 @@ shader_layout_compat! {
 
 shader_layout_compat! {
     //~^ ERROR: Failed to impl `ShaderLayoutCompat`: field `S2::a2` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
-    //~| ERROR: Failed to impl `ShaderLayoutCompat`: field `S2::a2` (`Nested`) is not properly aligned. The offset is 4 but required align is `ALIGN_COMPAT` (16)
     pub struct S2 {
         a1: f32,
         a2: Nested,

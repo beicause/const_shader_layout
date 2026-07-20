@@ -72,28 +72,57 @@ macro_rules! impl_shader_layout_compat {
 macro_rules! impl_shader_layout_custom_array_compat {
     ($elem_ty:ty, $array_ty:ty, $n:expr) => {
         $crate::impl_shader_layout_custom_array!($elem_ty, $array_ty, $n);
-        impl $crate::ShaderLayoutCompat for $array_ty
-        {
+        impl $crate::ShaderLayoutCompat for $array_ty {
             const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                <$elem_ty as $crate::ShaderLayout>::ALIGN.get().next_multiple_of(16)
-            ).unwrap();
+                <$elem_ty as $crate::ShaderLayout>::ALIGN
+                    .get()
+                    .next_multiple_of(16),
+            )
+            .unwrap();
             const SIZE_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                (size_of::<$elem_ty>() as u64).next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get()).next_multiple_of(16) * $n as u64
-            ).unwrap();
+                (size_of::<$elem_ty>() as u64)
+                    .next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
+                    .next_multiple_of(16)
+                    * $n as u64,
+            )
+            .unwrap();
         }
 
         // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
         const _: () = {
             const N: usize = $n;
             const SIZE: u64 = <$array_ty as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
-            const_format::assertcp!(
-                SIZE == size_of::<$array_ty>() as u64,
-                    "Failed to implement `ShaderLayoutCompat`: array `{}` size ({}) must be equal to its shader size ({}), i.e. the stride must be rounded up to `ALIGN` ({}) and 16",
-                    stringify!($array_ty),
-                    size_of::<$array_ty>(),
-                    SIZE,
+            if SIZE != size_of::<$array_ty>() as u64 {
+                let mut buf = [0u8; 256];
+                let mut pos = 0usize;
+                pos = $crate::internal::write_str(
+                    &mut buf,
+                    pos,
+                    "Failed to implement `ShaderLayoutCompat`: array `",
+                );
+                pos = $crate::internal::write_str(&mut buf, pos, stringify!($array_ty));
+                pos = $crate::internal::write_str(&mut buf, pos, "` size (");
+                pos = $crate::internal::write_usize(&mut buf, pos, size_of::<$array_ty>());
+                pos = $crate::internal::write_str(
+                    &mut buf,
+                    pos,
+                    ") must be equal to its shader size (",
+                );
+                pos = $crate::internal::write_u64(&mut buf, pos, SIZE);
+                pos = $crate::internal::write_str(
+                    &mut buf,
+                    pos,
+                    "), i.e. the stride must be rounded up to `ALIGN` (",
+                );
+                pos = $crate::internal::write_u64(
+                    &mut buf,
+                    pos,
                     <$elem_ty as $crate::ShaderLayout>::ALIGN.get(),
-            );
+                );
+                pos = $crate::internal::write_str(&mut buf, pos, ") and 16");
+                let msg = $crate::internal::buf_to_str(&buf, pos);
+                panic!("{}", msg);
+            }
         };
     };
 }
@@ -127,14 +156,21 @@ macro_rules! impl_shader_layout_array_compat {
                 const ELEMENT_ALIGN: u64 = <$ty as $crate::ShaderLayout>::ALIGN.get();
                 const N: usize = 1;
                 const SIZE: u64 = <[$ty; N] as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
-                const_format::assertcp!(
-                    SIZE == size_of::<[$ty; N]>() as u64,
-                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. the stride must be rounded up to `ALIGN` ({}) and 16",
-                        stringify!($ty),
-                        size_of::<[$ty; N]>(),
-                        SIZE,
-                        ELEMENT_ALIGN,
-                );
+                if SIZE != size_of::<[$ty; N]>() as u64 {
+                    let mut buf = [0u8; 256];
+                    let mut pos = 0usize;
+                    pos = $crate::internal::write_str(&mut buf, pos, "`[");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($ty));
+                    pos = $crate::internal::write_str(&mut buf, pos, "; N]` size (");
+                    pos = $crate::internal::write_usize(&mut buf, pos, size_of::<[$ty; N]>());
+                    pos = $crate::internal::write_str(&mut buf, pos, " * N) must be equal to its shader size (");
+                    pos = $crate::internal::write_u64(&mut buf, pos, SIZE);
+                    pos = $crate::internal::write_str(&mut buf, pos, " * N), i.e. the stride must be rounded up to `ALIGN` (");
+                    pos = $crate::internal::write_u64(&mut buf, pos, ELEMENT_ALIGN);
+                    pos = $crate::internal::write_str(&mut buf, pos, ") and 16");
+                    let msg = $crate::internal::buf_to_str(&buf, pos);
+                    panic!("{}", msg);
+                }
             };
         )+
     };
@@ -177,26 +213,42 @@ macro_rules! shader_layout_compat {
                 const MEMBER_SIZE: u64 = size_of::<$field_ty>() as u64;
                 const MEMBER_OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
 
-                const_format::assertcp!(
-                    MEMBER_SIZE == MEMBER_SIZE_COMPAT,
-                        "Failed to impl `ShaderLayoutCompat`: field `{}::{}` (`{}`) size ({}) must be `SIZE_COMPAT` ({}) due to uniform layout constraints",
-                        stringify!($struct_name),
-                        stringify!($field_name),
-                        stringify!($field_ty),
-                        MEMBER_SIZE,
-                        MEMBER_SIZE_COMPAT,
-                );
+                if MEMBER_SIZE != MEMBER_SIZE_COMPAT {
+                    let mut buf = [0u8; 256];
+                    let mut pos = 0usize;
+                    pos = $crate::internal::write_str(&mut buf, pos, "Failed to impl `ShaderLayoutCompat`: field `");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($struct_name));
+                    pos = $crate::internal::write_str(&mut buf, pos, "::");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($field_name));
+                    pos = $crate::internal::write_str(&mut buf, pos, "` (`");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($field_ty));
+                    pos = $crate::internal::write_str(&mut buf, pos, "`) size (");
+                    pos = $crate::internal::write_u64(&mut buf, pos, MEMBER_SIZE);
+                    pos = $crate::internal::write_str(&mut buf, pos, ") must be `SIZE_COMPAT` (");
+                    pos = $crate::internal::write_u64(&mut buf, pos, MEMBER_SIZE_COMPAT);
+                    pos = $crate::internal::write_str(&mut buf, pos, ") due to uniform layout constraints");
+                    let msg = $crate::internal::buf_to_str(&buf, pos);
+                    panic!("{}", msg);
+                }
 
-                const_format::assertcp!(
-                    MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT),
-                        "Failed to impl `ShaderLayoutCompat`: field `{}::{}` (`{}`) is not properly aligned. \
-                        The offset is {} but required align is `ALIGN_COMPAT` ({})",
-                        stringify!($struct_name),
-                        stringify!($field_name),
-                        stringify!($field_ty),
-                        MEMBER_OFFSET,
-                        MEMBER_ALIGN_COMPAT,
-                );
+                if !MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT) {
+                    let mut buf = [0u8; 256];
+                    let mut pos = 0usize;
+                    pos = $crate::internal::write_str(&mut buf, pos, "Failed to impl `ShaderLayoutCompat`: field `");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($struct_name));
+                    pos = $crate::internal::write_str(&mut buf, pos, "::");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($field_name));
+                    pos = $crate::internal::write_str(&mut buf, pos, "` (`");
+                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($field_ty));
+                    pos = $crate::internal::write_str(&mut buf, pos, "`) is not properly aligned. \
+                        The offset is ");
+                    pos = $crate::internal::write_u64(&mut buf, pos, MEMBER_OFFSET);
+                    pos = $crate::internal::write_str(&mut buf, pos, " but required align is `ALIGN_COMPAT` (");
+                    pos = $crate::internal::write_u64(&mut buf, pos, MEMBER_ALIGN_COMPAT);
+                    pos = $crate::internal::write_str(&mut buf, pos, ")");
+                    let msg = $crate::internal::buf_to_str(&buf, pos);
+                    panic!("{}", msg);
+                }
             };
         )*
 

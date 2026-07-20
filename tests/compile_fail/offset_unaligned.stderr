@@ -1,7 +1,4 @@
-error[E0080]: evaluation panicked: 
-              assertion failed.
-              Failed to implement `ShaderLayout`: field `OffsetUnaligned::a4` (`glam::Vec3`) is not properly aligned. The offset is 4 but required align is 16
-              
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: field `OffsetUnaligned::a4` (`glam::Vec3`) is not properly aligned. The offset is 4 but required align is 16
  --> tests/compile_fail/offset_unaligned.rs:3:1
   |
 3 | / shader_layout! {
@@ -10,9 +7,9 @@ error[E0080]: evaluation panicked:
 6 | |         a1: f32,
 ... |
 9 | | }
-  | |_^ evaluation of `_::_` failed here
+  | |_^ evaluation of `_` failed here
   |
-  = note: this error originates in the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)
+  = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: aborting due to 1 previous error
 

@@ -25,7 +25,6 @@ harness = false
 required-features = ["glam", "half", "std"]
 
 [dependencies]
-const_format = { version = "0.2.36", default-features = false, features = ["assertcp"] }
 glam = {
   version = "0.33",
   default-features = false,

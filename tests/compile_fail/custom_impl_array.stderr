@@ -1,57 +1,42 @@
-error[E0080]: evaluation panicked: 
-              assertion failed.
-              Failed to implement `ShaderLayout`: array `Vec3ArrayLen3` size (36) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (16)
-              
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: array `Vec3ArrayLen3` size (36) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (16)
   --> tests/compile_fail/custom_impl_array.rs:34:5
    |
 34 |     impl_shader_layout_custom_array!(Vec3, Vec3ArrayLen3, 3);
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `standard::_::_` failed here
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `standard::_` failed here
    |
-   = note: this error originates in the macro `impl_shader_layout_custom_array` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_custom_array` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: 
-              assertion failed.
-              Failed to implement `ShaderLayoutCompat`: array `F32ArrayLen4` size (16) must be equal to its shader size (64), i.e. the stride must be rounded up to `ALIGN` (4) and 16
-              
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutCompat`: array `F32ArrayLen4` size (16) must be equal to its shader size (64), i.e. the stride must be rounded up to `ALIGN` (4) and 16
   --> tests/compile_fail/custom_impl_array.rs:43:5
    |
 43 |     impl_shader_layout_custom_array_compat!(f32, F32ArrayLen4, 4);
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_::_` failed here
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here
    |
-   = note: this error originates in the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: 
-              assertion failed.
-              Failed to implement `ShaderLayoutCompat`: array `Vec2ArrayLen3` size (24) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (8) and 16
-              
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutCompat`: array `Vec2ArrayLen3` size (24) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (8) and 16
   --> tests/compile_fail/custom_impl_array.rs:46:5
    |
 46 |     impl_shader_layout_custom_array_compat!(Vec2, Vec2ArrayLen3, 3);
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_::_` failed here
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here
    |
-   = note: this error originates in the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: 
-              assertion failed.
-              Failed to implement `ShaderLayout`: array `Vec3ArrayLen3` size (36) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (16)
-              
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: array `Vec3ArrayLen3` size (36) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (16)
   --> tests/compile_fail/custom_impl_array.rs:49:5
    |
 49 |     impl_shader_layout_custom_array_compat!(Vec3, Vec3ArrayLen3, 3);
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_::_` failed here
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here
    |
-   = note: this error originates in the macro `$crate::impl_shader_layout_custom_array` which comes from the expansion of the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: 
-              assertion failed.
-              Failed to implement `ShaderLayoutCompat`: array `Vec3ArrayLen3` size (36) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (16) and 16
-              
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutCompat`: array `Vec3ArrayLen3` size (36) must be equal to its shader size (48), i.e. the stride must be rounded up to `ALIGN` (16) and 16
   --> tests/compile_fail/custom_impl_array.rs:49:5
    |
 49 |     impl_shader_layout_custom_array_compat!(Vec3, Vec3ArrayLen3, 3);
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_::_` failed here
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here
    |
-   = note: this error originates in the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_custom_array_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: aborting due to 5 previous errors
 
