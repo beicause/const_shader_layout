@@ -57,7 +57,7 @@ jobs:
 
       - name: Install rust toolchain
         run: |
-          rustup toolchain install stable --profile=minimal --component clippy
+          rustup toolchain install stable --no-self-update --profile=minimal --component clippy
 
       - name: Caching
         uses: Swatinem/rust-cache@v2
@@ -105,7 +105,7 @@ jobs:
 
       - name: Install rust toolchain
         run: |
-          rustup toolchain install stable --profile=minimal --component clippy
+          rustup toolchain install stable --no-self-update --profile=minimal --component clippy
           rustup target add wasm32-unknown-unknown
 
       - name: Caching
@@ -146,7 +146,7 @@ jobs:
 
       - name: Install rust toolchain
         run: |
-          rustup toolchain install stable --profile=minimal
+          rustup toolchain install stable --no-self-update --profile=minimal
           rustup target add aarch64-linux-android
 
       - name: Caching
