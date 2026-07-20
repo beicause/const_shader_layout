@@ -54,10 +54,11 @@ macro_rules! impl_shader_layout_array {
                 const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64;
                 const_format::assertcp!(
                     SIZE == size_of::<[$ty; N]>() as u64,
-                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. `N * roundUp(AlignOf(E), SizeOf(E))`",
+                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. the stride must be rounded up to `ALIGN` ({})",
                         stringify!($ty),
                         size_of::<[$ty; N]>(),
                         SIZE,
+                        <$ty as $crate::ShaderLayout>::ALIGN.get(),
                 );
             };
         )+
@@ -98,9 +99,10 @@ macro_rules! shader_layout {
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 const_format::assertcp!(
                     OFFSET.is_multiple_of(ALIGN),
-                        "Failed to implement `ShaderLayout`: Field `{}::{}` is not properly aligned. The offset is {} but required align is {}",
+                        "Failed to implement `ShaderLayout`: field `{}::{}` (`{}`) is not properly aligned. The offset is {} but required align is {}",
                         stringify!($struct_name),
                         stringify!($field_name),
+                        stringify!($field_ty),
                         OFFSET,
                         ALIGN,
                 );
@@ -131,10 +133,11 @@ macro_rules! shader_layout {
             const SIZE: u64 = (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get());
             const_format::assertcp!(
                 (size_of::<$struct_name>() as u64) == SIZE,
-                "Failed to implement `ShaderLayout`: Struct `{}` size ({}) must be equal to its shader size ({}), i.e. `roundUp(AlignOf(S), SizeOf(S)))`",
+                "Failed to implement `ShaderLayout`: struct `{}` size ({}) must be equal to its shader size ({}), i.e. rounded up to its `ALIGN` ({})",
                 stringify!($struct_name),
                 size_of::<$struct_name>(),
                 SIZE,
+                <$struct_name as $crate::ShaderLayout>::ALIGN.get(),
             );
         };
     };

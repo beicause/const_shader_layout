@@ -89,10 +89,11 @@ macro_rules! impl_shader_layout_array_compat {
                 const SIZE: u64 = <[$ty; N] as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
                 const_format::assertcp!(
                     SIZE == size_of::<[$ty; N]>() as u64,
-                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`",
+                        "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. the stride must be rounded up to `ALIGN` ({}) and 16",
                         stringify!($ty),
                         size_of::<[$ty; N]>(),
                         SIZE,
+                        <$ty as $crate::ShaderLayout>::ALIGN.get(),
                 );
             };
         )+
@@ -138,19 +139,21 @@ macro_rules! shader_layout_compat {
 
                 const_format::assertcp!(
                     MEMBER_SIZE == MEMBER_SIZE_COMPAT,
-                        "Failed to impl `ShaderLayoutCompat`: Field `{}::{}` size ({}) must be {} due to uniform layout constraints",
+                        "Failed to impl `ShaderLayoutCompat`: field `{}::{}` (`{}`) size ({}) must be `SIZE_COMPAT` ({}) due to uniform layout constraints",
                         stringify!($struct_name),
                         stringify!($field_name),
+                        stringify!($field_ty),
                         MEMBER_SIZE,
                         MEMBER_SIZE_COMPAT,
                 );
 
                 const_format::assertcp!(
                     MEMBER_OFFSET.is_multiple_of(MEMBER_ALIGN_COMPAT),
-                        "Failed to impl `ShaderLayoutCompat`: Field `{}::{}` is not properly aligned. \
-                        The offset is {} but required align is {}",
+                        "Failed to impl `ShaderLayoutCompat`: field `{}::{}` (`{}`) is not properly aligned. \
+                        The offset is {} but required align is `ALIGN_COMPAT` ({})",
                         stringify!($struct_name),
                         stringify!($field_name),
+                        stringify!($field_ty),
                         MEMBER_OFFSET,
                         MEMBER_ALIGN_COMPAT,
                 );

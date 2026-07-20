@@ -43,7 +43,7 @@ shader_layout_compat! {
     pub struct MyUniform {
         a1: Nested,
         a2: Vec3,
-        // Padding is not needed, because struct size (64) aligned to 16 in `repr(C)`, so it matches shader size (64).
+        // Padding is implicit, because struct size is 64 aligned to 16 in `repr(C)` which matches shader size (64).
     }
 }
 const {

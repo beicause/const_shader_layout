@@ -1,6 +1,6 @@
 error[E0080]: evaluation panicked: 
               assertion failed.
-              Failed to implement `ShaderLayout`: Field `OffsetUnaligned::a4` is not properly aligned. The offset is 4 but required align is 16
+              Failed to implement `ShaderLayout`: field `OffsetUnaligned::a4` (`glam::Vec3`) is not properly aligned. The offset is 4 but required align is 16
               
  --> tests/compile_fail/offset_unaligned.rs:3:1
   |

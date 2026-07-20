@@ -1,6 +1,6 @@
 error[E0080]: evaluation panicked: 
               assertion failed.
-              Failed to impl `ShaderLayoutCompat`: Field `S1::a1` size (4) must be 16 due to uniform layout constraints
+              Failed to impl `ShaderLayoutCompat`: field `S1::a1` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
               
   --> tests/compile_fail/struct_align_compat.rs:9:1
    |
@@ -16,7 +16,7 @@ error[E0080]: evaluation panicked:
 
 error[E0080]: evaluation panicked: 
               assertion failed.
-              Failed to impl `ShaderLayoutCompat`: Field `S2::a2` size (4) must be 16 due to uniform layout constraints
+              Failed to impl `ShaderLayoutCompat`: field `S2::a2` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
               
   --> tests/compile_fail/struct_align_compat.rs:17:1
    |
@@ -32,7 +32,7 @@ error[E0080]: evaluation panicked:
 
 error[E0080]: evaluation panicked: 
               assertion failed.
-              Failed to impl `ShaderLayoutCompat`: Field `S2::a2` is not properly aligned. The offset is 4 but required align is 16
+              Failed to impl `ShaderLayoutCompat`: field `S2::a2` (`Nested`) is not properly aligned. The offset is 4 but required align is `ALIGN_COMPAT` (16)
               
   --> tests/compile_fail/struct_align_compat.rs:17:1
    |
