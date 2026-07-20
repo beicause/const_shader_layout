@@ -53,35 +53,17 @@ macro_rules! impl_shader_layout_custom_array {
                 .next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
                 * N as u64;
             if SIZE != size_of::<$array_ty>() as u64 {
-                let mut buf = [0u8; 256];
-                let mut pos = 0usize;
-                pos = $crate::internal::write_str(
-                    &mut buf,
-                    pos,
-                    "Failed to implement `ShaderLayout`: array `",
-                );
-                pos = $crate::internal::write_str(&mut buf, pos, stringify!($array_ty));
-                pos = $crate::internal::write_str(&mut buf, pos, "` size (");
-                pos = $crate::internal::write_usize(&mut buf, pos, size_of::<$array_ty>());
-                pos = $crate::internal::write_str(
-                    &mut buf,
-                    pos,
-                    ") must be equal to its shader size (",
-                );
-                pos = $crate::internal::write_u64(&mut buf, pos, SIZE);
-                pos = $crate::internal::write_str(
-                    &mut buf,
-                    pos,
-                    "), i.e. the stride must be rounded up to `ALIGN` (",
-                );
-                pos = $crate::internal::write_u64(
-                    &mut buf,
-                    pos,
-                    <$elem_ty as $crate::ShaderLayout>::ALIGN.get(),
-                );
-                pos = $crate::internal::write_str(&mut buf, pos, ")");
-                let msg = $crate::internal::buf_to_str(&buf, pos);
-                panic!("{}", msg);
+                let mut msg = $crate::internal::MsgBuf::<256>::new();
+                msg.write_str("Failed to implement `ShaderLayout`: array `")
+                    .write_str(stringify!($array_ty))
+                    .write_str("` size (")
+                    .write_usize(size_of::<$array_ty>())
+                    .write_str(") must be equal to its shader size (")
+                    .write_u64(SIZE)
+                    .write_str("), i.e. the stride must be rounded up to `ALIGN` (")
+                    .write_u64(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
+                    .write_str(")");
+                panic!("{}", msg.as_str());
             }
         };
     };
@@ -110,19 +92,17 @@ macro_rules! impl_shader_layout_array {
                 const ACTUAL_SIZE: u64 = size_of::<[$ty; N]>() as u64;
                 const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(ELEMENT_ALIGN) * N as u64;
                 if SIZE != ACTUAL_SIZE {
-                    let mut buf = [0u8; 256];
-                    let mut pos = 0usize;
-                    pos = $crate::internal::write_str(&mut buf, pos, "`[");
-                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($ty));
-                    pos = $crate::internal::write_str(&mut buf, pos, "; N]` size (");
-                    pos = $crate::internal::write_usize(&mut buf, pos, size_of::<[$ty; N]>());
-                    pos = $crate::internal::write_str(&mut buf, pos, " * N) must be equal to its shader size (");
-                    pos = $crate::internal::write_u64(&mut buf, pos, SIZE);
-                    pos = $crate::internal::write_str(&mut buf, pos, " * N), i.e. the stride must be rounded up to `ALIGN` (");
-                    pos = $crate::internal::write_u64(&mut buf, pos, ELEMENT_ALIGN);
-                    pos = $crate::internal::write_str(&mut buf, pos, ")");
-                    let msg = $crate::internal::buf_to_str(&buf, pos);
-                    panic!("{}", msg);
+                    let mut msg = $crate::internal::MsgBuf::<256>::new();
+                    msg.write_str("`[")
+                        .write_str(stringify!($ty))
+                        .write_str("; N]` size (")
+                        .write_usize(size_of::<[$ty; N]>())
+                        .write_str(" * N) must be equal to its shader size (")
+                        .write_u64(SIZE)
+                        .write_str(" * N), i.e. the stride must be rounded up to `ALIGN` (")
+                        .write_u64(ELEMENT_ALIGN)
+                        .write_str(")");
+                    panic!("{}", msg.as_str());
                 }
             };
         )+
@@ -162,20 +142,18 @@ macro_rules! shader_layout {
                 const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
                 const ALIGN: u64 = <$field_ty as $crate::ShaderLayout>::ALIGN.get();
                 if !OFFSET.is_multiple_of(ALIGN) {
-                    let mut buf = [0u8; 256];
-                    let mut pos = 0usize;
-                    pos = $crate::internal::write_str(&mut buf, pos, "Failed to implement `ShaderLayout`: field `");
-                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($struct_name));
-                    pos = $crate::internal::write_str(&mut buf, pos, "::");
-                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($field_name));
-                    pos = $crate::internal::write_str(&mut buf, pos, "` (`");
-                    pos = $crate::internal::write_str(&mut buf, pos, stringify!($field_ty));
-                    pos = $crate::internal::write_str(&mut buf, pos, "`) is not properly aligned. The offset is ");
-                    pos = $crate::internal::write_u64(&mut buf, pos, OFFSET);
-                    pos = $crate::internal::write_str(&mut buf, pos, " but required align is ");
-                    pos = $crate::internal::write_u64(&mut buf, pos, ALIGN);
-                    let msg = $crate::internal::buf_to_str(&buf, pos);
-                    panic!("{}", msg);
+                    let mut msg = $crate::internal::MsgBuf::<256>::new();
+                    msg.write_str("Failed to implement `ShaderLayout`: field `")
+                        .write_str(stringify!($struct_name))
+                        .write_str("::")
+                        .write_str(stringify!($field_name))
+                        .write_str("` (`")
+                        .write_str(stringify!($field_ty))
+                        .write_str("`) is not properly aligned. The offset is ")
+                        .write_u64(OFFSET)
+                        .write_str(" but required align is ")
+                        .write_u64(ALIGN);
+                    panic!("{}", msg.as_str());
                 }
             };
         )*
@@ -203,19 +181,17 @@ macro_rules! shader_layout {
         const _: () = {
             const SIZE: u64 = (size_of::<$struct_name>() as u64).next_multiple_of(<$struct_name as $crate::ShaderLayout>::ALIGN.get());
             if size_of::<$struct_name>() as u64 != SIZE {
-                let mut buf = [0u8; 256];
-                let mut pos = 0usize;
-                pos = $crate::internal::write_str(&mut buf, pos, "Failed to implement `ShaderLayout`: struct `");
-                pos = $crate::internal::write_str(&mut buf, pos, stringify!($struct_name));
-                pos = $crate::internal::write_str(&mut buf, pos, "` size (");
-                pos = $crate::internal::write_usize(&mut buf, pos, size_of::<$struct_name>());
-                pos = $crate::internal::write_str(&mut buf, pos, ") must be equal to its shader size (");
-                pos = $crate::internal::write_u64(&mut buf, pos, SIZE);
-                pos = $crate::internal::write_str(&mut buf, pos, "), i.e. rounded up to its `ALIGN` (");
-                pos = $crate::internal::write_u64(&mut buf, pos, <$struct_name as $crate::ShaderLayout>::ALIGN.get());
-                pos = $crate::internal::write_str(&mut buf, pos, ")");
-                let msg = $crate::internal::buf_to_str(&buf, pos);
-                panic!("{}", msg);
+                let mut msg = $crate::internal::MsgBuf::<256>::new();
+                msg.write_str("Failed to implement `ShaderLayout`: struct `")
+                    .write_str(stringify!($struct_name))
+                    .write_str("` size (")
+                    .write_usize(size_of::<$struct_name>())
+                    .write_str(") must be equal to its shader size (")
+                    .write_u64(SIZE)
+                    .write_str("), i.e. rounded up to its `ALIGN` (")
+                    .write_u64(<$struct_name as $crate::ShaderLayout>::ALIGN.get())
+                    .write_str(")");
+                panic!("{}", msg.as_str());
             }
         };
     };
