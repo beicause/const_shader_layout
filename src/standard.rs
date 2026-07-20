@@ -81,15 +81,17 @@ macro_rules! impl_shader_layout_array {
 
             // Assert array size is equal to `N * roundUp(AlignOf(E), SizeOf(E))`
             const _: () = {
+                const ELEMENT_ALIGN: u64 = <$ty as $crate::ShaderLayout>::ALIGN.get();
                 const N: usize = 1;
-                const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()) * N as u64;
+                const ACTUAL_SIZE: u64 = size_of::<[$ty; N]>() as u64;
+                const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(ELEMENT_ALIGN) * N as u64;
                 const_format::assertcp!(
-                    SIZE == size_of::<[$ty; N]>() as u64,
+                    SIZE == ACTUAL_SIZE,
                         "`[{}; N]` size ({} * N) must be equal to its shader size ({} * N), i.e. the stride must be rounded up to `ALIGN` ({})",
                         stringify!($ty),
                         size_of::<[$ty; N]>(),
                         SIZE,
-                        <$ty as $crate::ShaderLayout>::ALIGN.get(),
+                        ELEMENT_ALIGN,
                 );
             };
         )+

@@ -124,6 +124,7 @@ macro_rules! impl_shader_layout_array_compat {
 
             // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
             const _: () = {
+                const ELEMENT_ALIGN: u64 = <$ty as $crate::ShaderLayout>::ALIGN.get();
                 const N: usize = 1;
                 const SIZE: u64 = <[$ty; N] as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
                 const_format::assertcp!(
@@ -132,7 +133,7 @@ macro_rules! impl_shader_layout_array_compat {
                         stringify!($ty),
                         size_of::<[$ty; N]>(),
                         SIZE,
-                        <$ty as $crate::ShaderLayout>::ALIGN.get(),
+                        ELEMENT_ALIGN,
                 );
             };
         )+
