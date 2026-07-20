@@ -2,7 +2,7 @@ use crate::ShaderLayout;
 
 /// Marks the type's uniform-compatible alignment requirement in shader, i.e. with uniform address layout constraints.
 ///
-/// If the type is constrained, its size in shader will be equal to [`ShaderLayoutCompat::SIZE_COMPAT`] Instead of `size_of::<Self>`.
+/// If the type is constrained, its size in shader will be equal to [`ShaderLayoutCompat::SIZE_COMPAT`] instead of `size_of::<Self>()`.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 pub trait ShaderLayoutCompat: ShaderLayout {
