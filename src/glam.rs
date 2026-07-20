@@ -16,13 +16,13 @@ impl_shader_layout_compat!(16, IVec4, UVec4, Vec4, Quat);
 
 // Matrix
 impl_shader_layout_compat!(8, Mat2);
-// Can't use `Mat3` as its column vectors are not properly aligned.
+// Use `Mat3A` as `Mat3`'s column vectors are not properly aligned.
 impl_shader_layout_compat!(16, Mat3A);
 impl_shader_layout_compat!(16, Mat4);
 
 // Array
-// Vec3 should not be implemented, because the size of `[Vec3; N]` != `N * roundUp(AlignOf(E), SizeOf(E))`
+// `*Vec3` should not be implemented, because the size of `[Vec3; N]` != `N * roundUp(AlignOf(E), SizeOf(E))`
 impl_shader_layout_array!(I16Vec2, U16Vec2, I16Vec4, U16Vec4, IVec2, UVec2, Vec2);
-// Only 16-byte types should implement `ShaderLayoutCompat`
+// Only 16-byte aligned types should implement `ShaderLayoutCompat`
 impl_shader_layout_array_compat!(IVec4, UVec4, Vec4, Quat);
 impl_shader_layout_array_compat!(Mat2, Mat3A, Mat4);
