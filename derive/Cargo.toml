@@ -1,6 +1,6 @@
 [package]
 name = "const_shader_layout_derive"
-version = "0.2.0-dev"
+version = "0.2.0"
 edition = "2024"
 description = "derive proc-macros for `const_shader_layout`"
 repository = "https://github.com/beicause/const_shader_layout"
