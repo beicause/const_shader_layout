@@ -79,34 +79,17 @@ macro_rules! impl_shader_layout_array_element {
     };
 }
 
-/// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.
-///
-/// Checks at compile-time:
-/// * For each field, `core::mem::offset_of!(struct, field)` must be equal to its [`ShaderLayout::ALIGN`].
-/// * Struct size must be equal to `roundUp(AlignOf(S), SizeOf(S)))`.
-///
-/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 #[macro_export]
-macro_rules! shader_layout {
-    (
-        $(#[$attr:meta])*
-        $vis:vis struct $struct_name:ident {
-            $(
-                $(#[$field_attr:meta])*
-                $field_vis:vis $field_name:ident : $field_ty:ty
-            ),* $(,)?
-        }
-   ) => {
-        #[derive(Copy, Clone)]
-        #[repr(C)]
-        $(#[$attr])*
-        $vis struct $struct_name {
-            $(
-                $(#[$field_attr])*
-                $field_vis $field_name: $field_ty
-            ),*
-        }
-
+macro_rules! shader_layout_assert {
+       (
+           $(#[$attr:meta])*
+           $vis:vis struct $struct_name:ident {
+               $(
+                   $(#[$field_attr:meta])*
+                   $field_vis:vis $field_name:ident : $field_ty:ty
+               ),* $(,)?
+           }
+      ) => {
         $(
             const _: () = {
                 const OFFSET: u64 = core::mem::offset_of!($struct_name, $field_name) as u64;
@@ -166,5 +149,45 @@ macro_rules! shader_layout {
         };
 
         impl $crate::ShaderLayoutArrayElement for $struct_name {}
+    };
+}
+
+/// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayout`] for this struct, or fails at compile-time.
+///
+/// Checks at compile-time:
+/// * For each field, `core::mem::offset_of!(struct, field)` must be equal to its [`ShaderLayout::ALIGN`].
+/// * Struct size must be equal to `roundUp(AlignOf(S), SizeOf(S)))`.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
+#[macro_export]
+macro_rules! shader_layout {
+    (
+        $(#[$attr:meta])*
+        $vis:vis struct $struct_name:ident {
+            $(
+                $(#[$field_attr:meta])*
+                $field_vis:vis $field_name:ident : $field_ty:ty
+            ),* $(,)?
+        }
+   ) => {
+        #[derive(Copy, Clone)]
+        #[repr(C)]
+        $(#[$attr])*
+        $vis struct $struct_name {
+            $(
+                $(#[$field_attr])*
+                $field_vis $field_name: $field_ty
+            ),*
+        }
+
+        $crate::shader_layout_assert!{
+            $(#[$attr])*
+            $vis struct $struct_name {
+                $(
+                    $(#[$field_attr])*
+                    $field_vis $field_name: $field_ty
+                ),*
+            }
+        }
     };
 }

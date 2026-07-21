@@ -9,13 +9,13 @@ use glam::{
 use half::f16;
 
 shader_layout! {
-    pub struct NestedStd {
+    struct NestedStd {
         a1: f32,
     }
 }
 
 shader_layout_compat! {
-    pub struct NestedCompat {
+    pub(crate) struct NestedCompat {
         a1: Vec4,
     }
 }
@@ -24,8 +24,8 @@ impl ShaderLayoutCompatArrayElement for NestedCompat {}
 shader_layout! {
     pub struct AllTypeArrays {
         // 16-bit scalars
-        f16_arr: [f16; 2],
-        i16_arr: [i16; 2],
+        pub f16_arr: [f16; 2],
+        pub(crate) i16_arr: [i16; 2],
         u16_arr: [u16; 2],
         nonzero_i16_arr: [NonZero<i16>; 2],
         nonzero_u16_arr: [NonZero<u16>; 2],
@@ -107,8 +107,8 @@ shader_layout_compat! {
     pub struct AllTypeArraysCompat {
 
         // Matrices & quaternion
-        mat2_arr: [Mat2; 2],
-        mat3a_arr: [Mat3A; 2],
+        pub mat2_arr: [Mat2; 2],
+        pub(crate) mat3a_arr: [Mat3A; 2],
         mat4_arr: [Mat4; 2],
         quat_arr: [Quat; 2],
 

@@ -106,17 +106,8 @@ macro_rules! impl_shader_layout_compat_array_element {
     };
 }
 
-/// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayoutCompat`] for this struct, or fails at compile-time.
-///
-/// Different from [`ShaderLayout`], the alignment of struct must be a multiple of 16.
-///
-/// Checks at compile-time:
-/// * For each field, `core::mem::offset_of!(struct, field)` must be equal to its [`ShaderLayoutCompat::ALIGN_COMPAT`].
-/// * Struct size must be equal to `roundUp(16, roundUp(AlignOf(S), SizeOf(S))))`.
-///
-/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 #[macro_export]
-macro_rules! shader_layout_compat {
+macro_rules! shader_layout_compat_assert {
     (
         $(#[$attr:meta])*
         $vis:vis struct $struct_name:ident {
@@ -126,16 +117,6 @@ macro_rules! shader_layout_compat {
             ),* $(,)?
         }
    ) => {
-        $crate::shader_layout!(
-            $(#[$attr])*
-            $vis struct $struct_name {
-                $(
-                    $(#[$field_attr])*
-                    $field_vis $field_name: $field_ty
-                ),*
-            }
-        );
-
         $(
             const _: () = {
                 const MEMBER_ALIGN_COMPAT: u64 = <$field_ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get();
@@ -207,5 +188,47 @@ macro_rules! shader_layout_compat {
                 ::core::num::NonZero::new(sum.next_multiple_of(16)).unwrap()
             };
         }
+    };
+}
+
+/// Checks if all the struct's fields conform to shader layout then implements [`ShaderLayoutCompat`] for this struct, or fails at compile-time.
+///
+/// Different from [`ShaderLayout`], the alignment of struct must be a multiple of 16.
+///
+/// Checks at compile-time:
+/// * For each field, `core::mem::offset_of!(struct, field)` must be equal to its [`ShaderLayoutCompat::ALIGN_COMPAT`].
+/// * Struct size must be equal to `roundUp(16, roundUp(AlignOf(S), SizeOf(S))))`.
+///
+/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
+#[macro_export]
+macro_rules! shader_layout_compat {
+    (
+        $(#[$attr:meta])*
+        $vis:vis struct $struct_name:ident {
+            $(
+                $(#[$field_attr:meta])*
+                $field_vis:vis $field_name:ident : $field_ty:ty
+            ),* $(,)?
+        }
+   ) => {
+       $crate::shader_layout!(
+           $(#[$attr])*
+           $vis struct $struct_name {
+               $(
+                   $(#[$field_attr])*
+                   $field_vis $field_name: $field_ty
+               ),*
+           }
+       );
+
+       $crate::shader_layout_compat_assert!{
+           $(#[$attr])*
+           $vis struct $struct_name {
+               $(
+                   $(#[$field_attr])*
+                   $field_vis $field_name: $field_ty
+               ),*
+           }
+       }
     };
 }

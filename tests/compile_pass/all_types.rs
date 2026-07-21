@@ -9,13 +9,13 @@ use glam::{
 use half::f16;
 
 shader_layout! {
-    pub struct NestedStd {
+    struct NestedStd {
         a1: f32,
     }
 }
 
 shader_layout_compat! {
-    pub struct NestedCompat {
+    pub(crate) struct NestedCompat {
         a1: Vec4,
     }
 }
@@ -23,8 +23,8 @@ shader_layout_compat! {
 shader_layout! {
     pub struct AllTypes {
         // 16-bit scalars
-        f16_val: f16,
-        i16_val: i16,
+        pub f16_val: f16,
+        pub(crate) i16_val: i16,
         u16_val: u16,
         nonzero_i16: NonZero<i16>,
         nonzero_u16: NonZero<u16>,
@@ -108,8 +108,8 @@ shader_layout! {
 shader_layout_compat! {
     pub struct AllTypesCompat {
         // 16-bit scalars
-        f16_val: f16,
-        i16_val: i16,
+        pub f16_val: f16,
+        pub(crate) i16_val: i16,
         u16_val: u16,
         nonzero_i16: NonZero<i16>,
         nonzero_u16: NonZero<u16>,

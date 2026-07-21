@@ -5,11 +5,8 @@
 [![Cargo](https://img.shields.io/crates/v/const_shader_layout.svg)](https://crates.io/crates/const_shader_layout)
 [![Documentation](https://docs.rs/const_shader_layout/badge.svg)](https://docs.rs/const_shader_layout)
 
-All validation is performed at compile time using **declarative macros** (`macro_rules!`) — no proc macros,
-no build dependencies, no compile-time overhead beyond the checks themselves.
-
-The core of this crate is the [`shader_layout`], [`shader_layout_compat`] macros and the
-[`ShaderLayout`], [`ShaderLayoutCompat`] traits.
+The core of this crate is the [`shader_layout`], [`shader_layout_compat`] declarative macros
+(or corresponding derive macros if `derive` feature is enabled) and the [`ShaderLayout`], [`ShaderLayoutCompat`] traits.
 
 `ShaderLayout` corresponds to <https://www.w3.org/TR/WGSL/#alignment-and-size>.
 
@@ -70,6 +67,7 @@ See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what
 
 | Feature | Description |
 |---------|-------------|
+| `derive` | Enable `ShaderLayout`, `ShaderLayoutCompat` derive macros  |
 | `glam` (default) | Implements `ShaderLayout`/`ShaderLayoutCompat` for `glam` types |
 | `half` | Implements `ShaderLayout`/`ShaderLayoutCompat` for `half::f16` and array of it |
 | `std` (default), `libm`, `nostd-libm` | Re-export `glam`'s corresponding features |

@@ -1,0 +1,9 @@
+[package]
+name = "const_shader_layout_ui_test"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+const_shader_layout = { path = "..", features = ["derive", "glam", "std"] }
+half = { version = "2", default-features = false }
+ui_test = "0.30.7"

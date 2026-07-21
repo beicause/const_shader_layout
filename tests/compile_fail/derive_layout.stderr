@@ -1,0 +1,70 @@
+error: Struct must be `#[repr(C)]` or `#[repr(transparent)]` for `ShaderLayout`
+ --> tests/compile_fail/derive_layout.rs:3:23
+  |
+3 | #[derive(Clone, Copy, ShaderLayout)]
+  |                       ^^^^^^^^^^^^
+  |
+  = note: this error originates in the derive macro `ShaderLayout` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: Struct must be `#[repr(C)]` or `#[repr(transparent)]` for `ShaderLayoutCompat`
+ --> tests/compile_fail/derive_layout.rs:9:23
+  |
+9 | #[derive(Clone, Copy, ShaderLayoutCompat)]
+  |                       ^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the derive macro `ShaderLayoutCompat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: field `OffsetUnaligned::a4` (`glam::Vec3`) is not properly aligned. The offset is 4 but required align is 16
+  --> tests/compile_fail/derive_layout.rs:28:23
+   |
+28 | #[derive(Clone, Copy, ShaderLayout)]
+   |                       ^^^^^^^^^^^^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the derive macro `ShaderLayout` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: struct `SizeUnaligned` size (12) must be equal to its shader size (16), i.e. rounded up to its `ALIGN` (16)
+  --> tests/compile_fail/derive_layout.rs:36:23
+   |
+36 | #[derive(Clone, Copy, ShaderLayout)]
+   |                       ^^^^^^^^^^^^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the derive macro `ShaderLayout` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satisfied
+  --> tests/compile_fail/derive_layout.rs:45:9
+   |
+45 |     a1: [f32; 1],
+   |         ^^^^^^^^ the trait `ShaderLayoutCompatArrayElement` is not implemented for `f32`
+   |
+   = help: the following other types implement trait `ShaderLayoutCompatArrayElement`:
+             IVec4
+             Mat2
+             Mat3A
+             Mat4
+             Quat
+             Reverse<T>
+             Saturating<T>
+             UVec4
+           and 3 others
+   = note: required for `[f32; 1]` to implement `ShaderLayoutCompat`
+
+error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned::a1` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
+  --> tests/compile_fail/derive_layout.rs:56:23
+   |
+56 | #[derive(Clone, Copy, ShaderLayoutCompat)]
+   |                       ^^^^^^^^^^^^^^^^^^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the derive macro `ShaderLayoutCompat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned2::a2` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
+  --> tests/compile_fail/derive_layout.rs:64:23
+   |
+64 | #[derive(Clone, Copy, ShaderLayoutCompat)]
+   |                       ^^^^^^^^^^^^^^^^^^ evaluation of `_` failed here
+   |
+   = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the derive macro `ShaderLayoutCompat` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: aborting due to 7 previous errors
+
+Some errors have detailed explanations: E0080, E0277.
+For more information about an error, try `rustc --explain E0080`.

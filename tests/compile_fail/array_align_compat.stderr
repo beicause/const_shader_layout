@@ -5,6 +5,7 @@ error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satis
   |             ^^^^^^^^ the trait `ShaderLayoutCompatArrayElement` is not implemented for `f32`
   |
   = help: the following other types implement trait `ShaderLayoutCompatArrayElement`:
+            Reverse<T>
             Saturating<T>
             Wrapping<T>
             glam::f32::sse2::mat2::Mat2
@@ -12,8 +13,7 @@ error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satis
             glam::f32::sse2::mat4::Mat4
             glam::f32::sse2::quat::Quat
             glam::f32::sse2::vec3a::Vec3A
-            glam::f32::sse2::vec4::Vec4
-          and 2 others
+          and 3 others
   = note: required for `[f32; 1]` to implement `ShaderLayoutCompat`
 
 error: aborting due to 1 previous error
