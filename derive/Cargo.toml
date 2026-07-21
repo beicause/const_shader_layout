@@ -2,6 +2,10 @@
 name = "const_shader_layout_derive"
 version = "0.1.0"
 edition = "2024"
+description = "derive proc-macros for `const_shader_layout`"
+repository = "https://github.com/beicause/const_shader_layout"
+license = "MIT OR Apache-2.0"
+keywords = ["const", "macro", "shader", "wgsl"]
 
 [lib]
 proc-macro = true
