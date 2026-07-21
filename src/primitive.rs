@@ -1,3 +1,4 @@
+use core::cmp::Reverse;
 use core::num::{NonZero, Saturating, Wrapping};
 
 use crate::{impl_shader_layout_array_element, impl_shader_layout_compat_primitive};
@@ -28,23 +29,21 @@ impl_shader_layout_array_element!(
     NonZero<u32>,
 );
 
-// Derive the traits since them are `repr(transparent)`
-impl<T: crate::ShaderLayout> crate::ShaderLayout for Saturating<T> {
-    const ALIGN: NonZero<u64> = NonZero::new(align_of::<T>() as u64).unwrap();
-}
-impl<T: crate::ShaderLayout> crate::ShaderLayout for Wrapping<T> {
-    const ALIGN: NonZero<u64> = NonZero::new(align_of::<T>() as u64).unwrap();
-}
-impl<T: crate::ShaderLayoutCompat> crate::ShaderLayoutCompat for Saturating<T> {}
-impl<T: crate::ShaderLayoutCompat> crate::ShaderLayoutCompat for Wrapping<T> {}
+macro_rules! impl_transparent_generic_wrapper {
+    ($($ty:ty),+$(,)?) => {
+        $(
+            impl<T: crate::ShaderLayout> crate::ShaderLayout for $ty {
+                const ALIGN: NonZero<u64> = NonZero::new(align_of::<T>() as u64).unwrap();
+            }
+            impl<T: crate::ShaderLayoutCompat> crate::ShaderLayoutCompat for $ty {}
 
-impl<T: crate::ShaderLayoutArrayElement> crate::ShaderLayoutArrayElement for Saturating<T> {}
-impl<T: crate::ShaderLayoutArrayElement> crate::ShaderLayoutArrayElement for Wrapping<T> {}
-impl<T: crate::ShaderLayoutCompatArrayElement> crate::ShaderLayoutCompatArrayElement
-    for Saturating<T>
-{
+            impl<T: crate::ShaderLayoutArrayElement> crate::ShaderLayoutArrayElement for $ty {}
+            impl<T: crate::ShaderLayoutCompatArrayElement> crate::ShaderLayoutCompatArrayElement
+                for $ty
+            {}
+        )+
+    };
 }
-impl<T: crate::ShaderLayoutCompatArrayElement> crate::ShaderLayoutCompatArrayElement
-    for Wrapping<T>
-{
-}
+
+// Derive the traits since them are `repr(transparent)`
+impl_transparent_generic_wrapper!(Saturating<T>, Wrapping<T>, Reverse<T>);
