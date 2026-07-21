@@ -1,6 +1,6 @@
 //@check-pass
 use const_shader_layout::{ShaderLayoutCompatArrayElement, shader_layout, shader_layout_compat};
-use core::num::{NonZero, Wrapping};
+use core::num::{NonZero, Saturating, Wrapping};
 use glam::{
     I16Vec2, I16Vec4, IVec2, IVec4, Mat2, Mat3A, Mat4, Quat, U16Vec2, U16Vec4, UVec2, UVec4, Vec2,
     Vec3A, Vec4,
@@ -64,6 +64,11 @@ shader_layout! {
         a36: [NestedStd; 2],
         p4: [u32;2],
         a37: [NestedCompat; 2],
+        a38: [Saturating<i16>; 2],
+        a39: [Saturating<u16>; 2],
+        a40: [Saturating<f32>; 2],
+        a41: [Saturating<i32>; 2],
+        a42: [Saturating<u32>; 2],
     }
 }
 

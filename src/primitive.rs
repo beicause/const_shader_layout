@@ -1,4 +1,4 @@
-use core::num::{NonZero, Wrapping};
+use core::num::{NonZero, Saturating, Wrapping};
 
 use crate::{impl_shader_layout_array_element, impl_shader_layout_compat_primitive};
 
@@ -8,16 +8,11 @@ impl_shader_layout_compat_primitive!(
     u16,
     NonZero<i16>,
     NonZero<u16>,
-    Wrapping<i16>,
-    Wrapping<u16>,
     f32,
     i32,
     u32,
     NonZero<i32>,
     NonZero<u32>,
-    Wrapping<f32>,
-    Wrapping<i32>,
-    Wrapping<u32>,
 );
 
 // Array
@@ -26,14 +21,30 @@ impl_shader_layout_array_element!(
     u16,
     NonZero<i16>,
     NonZero<u16>,
-    Wrapping<i16>,
-    Wrapping<u16>,
     f32,
     i32,
     u32,
     NonZero<i32>,
     NonZero<u32>,
-    Wrapping<f32>,
-    Wrapping<i32>,
-    Wrapping<u32>,
 );
+
+// Derive the traits since them are `repr(transparent)`
+impl<T: crate::ShaderLayout> crate::ShaderLayout for Saturating<T> {
+    const ALIGN: NonZero<u64> = NonZero::new(align_of::<T>() as u64).unwrap();
+}
+impl<T: crate::ShaderLayout> crate::ShaderLayout for Wrapping<T> {
+    const ALIGN: NonZero<u64> = NonZero::new(align_of::<T>() as u64).unwrap();
+}
+impl<T: crate::ShaderLayoutCompat> crate::ShaderLayoutCompat for Saturating<T> {}
+impl<T: crate::ShaderLayoutCompat> crate::ShaderLayoutCompat for Wrapping<T> {}
+
+impl<T: crate::ShaderLayoutArrayElement> crate::ShaderLayoutArrayElement for Saturating<T> {}
+impl<T: crate::ShaderLayoutArrayElement> crate::ShaderLayoutArrayElement for Wrapping<T> {}
+impl<T: crate::ShaderLayoutCompatArrayElement> crate::ShaderLayoutCompatArrayElement
+    for Saturating<T>
+{
+}
+impl<T: crate::ShaderLayoutCompatArrayElement> crate::ShaderLayoutCompatArrayElement
+    for Wrapping<T>
+{
+}
