@@ -5,7 +5,11 @@
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 pub trait ShaderLayout: Clone + Copy + 'static {
     /// The type's alignment requirement in shader.
-    const ALIGN: core::num::NonZero<u64>;
+    const ALIGN: core::num::NonZero<u64> =
+        core::num::NonZero::new(align_of::<Self>() as u64).unwrap();
+    /// The type's size in shader.
+    const SIZE: core::num::NonZero<u64> =
+        core::num::NonZero::new(size_of::<Self>() as u64).unwrap();
 }
 
 /// Marks the type can be used as array element.
@@ -13,27 +17,16 @@ pub trait ShaderLayout: Clone + Copy + 'static {
 /// There is a blanket implementation of `ShaderLayout` for `[T; N]` where `T: ShaderLayoutArrayElement`.
 pub trait ShaderLayoutArrayElement: Clone + Copy + 'static {}
 
-impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayout for [T; N] {
-    const ALIGN: core::num::NonZero<u64> =
-        core::num::NonZero::new(align_of::<Self>() as u64).unwrap();
-}
+impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayout for [T; N] {}
 impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayoutArrayElement for [T; N] {}
-
-/// Implements [`ShaderLayout`] for the primitive types, with their original alignment.
-#[macro_export]
-#[doc(hidden)]
-macro_rules! impl_shader_layout_primitive {
-    ($($ty:ty),+$(,)?) => {
-        $(impl $crate::ShaderLayout for $ty {
-            const ALIGN: ::core::num::NonZero<u64> = ::core::num::NonZero::new(align_of::<$ty>() as u64).unwrap();
-        })+
-    };
-}
 
 /// Implements [`ShaderLayout`] for the types, with the specified alignment.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! impl_shader_layout {
+    ($($ty:ty),+$(,)?) => {
+        $(impl $crate::ShaderLayout for $ty {})+
+    };
     ($align:expr $(, $ty:ty)+$(,)?) => {
         $(
             impl $crate::ShaderLayout for $ty {

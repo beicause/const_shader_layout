@@ -6,10 +6,10 @@ use crate::ShaderLayout;
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 pub trait ShaderLayoutCompat: ShaderLayout {
-    /// The type's alignment requirement with uniform address layout constraints in shader.
+    /// The type's alignment requirement in shader if uniform address layout constraints apply.
     /// If the type is not constrained, it should be [`ShaderLayout::ALIGN`].
     const ALIGN_COMPAT: core::num::NonZero<u64> = Self::ALIGN;
-    /// The type's size requirement with uniform address layout constraints in shader.
+    /// The type's size constraint in shader if uniform address layout constraints apply, i.e. if the type is in array or struct.
     /// If the type is not constrained, it should be `size_of::<Self>()`.
     const SIZE_COMPAT: core::num::NonZero<u64> =
         core::num::NonZero::new(size_of::<Self>() as u64).unwrap();
@@ -23,22 +23,16 @@ pub trait ShaderLayoutCompatArrayElement: crate::ShaderLayoutArrayElement {}
 impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompat for [T; N] {}
 impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompatArrayElement for [T; N] {}
 
-/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the primitive types, with their original alignment.
-#[macro_export]
-#[doc(hidden)]
-macro_rules! impl_shader_layout_compat_primitive {
-    ($($ty:ty),+$(,)?) => {
-        $(
-            $crate::impl_shader_layout_primitive!($ty);
-            impl $crate::ShaderLayoutCompat for $ty {}
-        )+
-    };
-}
-
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with the specified alignment.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! impl_shader_layout_compat {
+    ($($ty:ty),+$(,)?) => {
+        $(
+            $crate::impl_shader_layout!($ty);
+            impl $crate::ShaderLayoutCompat for $ty {}
+        )+
+    };
     ($align:expr $(, $ty:ty)+$(,)?) => {
         $(
             $crate::impl_shader_layout!($align, $ty);

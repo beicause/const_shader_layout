@@ -1,10 +1,10 @@
 use core::cmp::Reverse;
 use core::num::{NonZero, Saturating, Wrapping};
 
-use crate::{impl_shader_layout_array_element, impl_shader_layout_compat_primitive};
+use crate::{impl_shader_layout_array_element, impl_shader_layout_compat};
 
 // Scalar
-impl_shader_layout_compat_primitive!(
+impl_shader_layout_compat!(
     i16,
     u16,
     NonZero<i16>,
