@@ -73,6 +73,9 @@ jobs:
       - name: Clippy all features
         run: cargo clippy --workspace --all-targets --all-features -- -Dwarnings
 
+      - name: Build ${{matrix.os}}
+        run: cargo build --workspace --all-features --all-targets
+
       - name: Test ${{matrix.os}}
         run: cargo test --workspace --all-targets --all-features
 
@@ -80,9 +83,6 @@ jobs:
         run: cargo doc --workspace --all-features --no-deps --document-private-items --keep-going
         env:
           RUSTDOCFLAGS: -D warnings
-
-      - name: Build ${{matrix.os}}
-        run: cargo build --workspace --all-features --all-targets
 
   build-wasm:
     needs: lint
