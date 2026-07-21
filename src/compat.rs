@@ -102,7 +102,7 @@ macro_rules! impl_shader_layout_compat_array_element {
 }
 
 #[macro_export]
-macro_rules! shader_layout_compat_assert {
+macro_rules! impl_shader_layout_compat_struct {
     (
         $(#[$attr:meta])*
         $vis:vis struct $struct_name:ident {
@@ -112,6 +112,16 @@ macro_rules! shader_layout_compat_assert {
             ),* $(,)?
         }
    ) => {
+       $crate::impl_shader_layout_struct!(
+           $(#[$attr])*
+           $vis struct $struct_name {
+               $(
+                   $(#[$field_attr])*
+                   $field_vis $field_name: $field_ty
+               ),*
+           }
+       );
+
         $(
             const _: () = {
                 const MEMBER_ALIGN_COMPAT: u64 = <$field_ty as $crate::ShaderLayoutCompat>::ALIGN_COMPAT.get();
@@ -206,17 +216,17 @@ macro_rules! shader_layout_compat {
             ),* $(,)?
         }
    ) => {
-       $crate::shader_layout!(
-           $(#[$attr])*
-           $vis struct $struct_name {
-               $(
-                   $(#[$field_attr])*
-                   $field_vis $field_name: $field_ty
-               ),*
-           }
-       );
+       #[derive(Copy, Clone)]
+       #[repr(C)]
+       $(#[$attr])*
+       $vis struct $struct_name {
+           $(
+               $(#[$field_attr])*
+               $field_vis $field_name: $field_ty
+           ),*
+       }
 
-       $crate::shader_layout_compat_assert!{
+       $crate::impl_shader_layout_compat_struct!{
            $(#[$attr])*
            $vis struct $struct_name {
                $(

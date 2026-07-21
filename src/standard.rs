@@ -74,7 +74,7 @@ macro_rules! impl_shader_layout_array_element {
 }
 
 #[macro_export]
-macro_rules! shader_layout_assert {
+macro_rules! impl_shader_layout_struct {
        (
            $(#[$attr:meta])*
            $vis:vis struct $struct_name:ident {
@@ -174,7 +174,7 @@ macro_rules! shader_layout {
             ),*
         }
 
-        $crate::shader_layout_assert!{
+        $crate::impl_shader_layout_struct!{
             $(#[$attr])*
             $vis struct $struct_name {
                 $(

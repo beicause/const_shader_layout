@@ -72,7 +72,7 @@ pub fn derive_shader_layout(input: TokenStream) -> TokenStream {
         );
     }
     macro_invocation(
-        path(&["const_shader_layout", "shader_layout_assert"]),
+        path(&["const_shader_layout", "impl_shader_layout_struct"]),
         input,
     )
 }
@@ -84,13 +84,8 @@ pub fn derive_shader_layout_compat(input: TokenStream) -> TokenStream {
             "Struct must be `#[repr(C)]` or `#[repr(transparent)]` for `ShaderLayoutCompat`",
         );
     }
-    let mut out = macro_invocation(
-        path(&["const_shader_layout", "shader_layout_assert"]),
-        input.clone(),
-    );
-    out.extend(macro_invocation(
-        path(&["const_shader_layout", "shader_layout_compat_assert"]),
+    macro_invocation(
+        path(&["const_shader_layout", "impl_shader_layout_compat_struct"]),
         input,
-    ));
-    out
+    )
 }
