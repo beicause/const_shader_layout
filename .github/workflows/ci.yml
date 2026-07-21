@@ -82,7 +82,7 @@ jobs:
         run: cargo build --workspace --all-features --all-targets
 
       - name: Run ui test ${{matrix.os}}
-        run: cargo r -p const_shader_layout_ui_test
+        run: cargo test -p const_shader_layout_ui_test
 
   build-wasm:
     needs: lint

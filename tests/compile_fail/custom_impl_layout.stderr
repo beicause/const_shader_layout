@@ -1,5 +1,5 @@
 error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `Compat::a2` (`Vec2ArrayLen3`) size (24) must be `SIZE_COMPAT` (48) due to uniform layout constraints
-  --> tests/compile_fail/custom_impl_layout.rs:17:1
+  --> compile_fail/custom_impl_layout.rs:17:1
    |
 17 | / shader_layout_compat! {
 18 | |

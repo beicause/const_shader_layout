@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satisfied
- --> tests/compile_fail/array_align_compat.rs:5:13
+ --> compile_fail/array_align_compat.rs:5:13
   |
 5 |         a1: [f32; 1],
   |             ^^^^^^^^ the trait `ShaderLayoutCompatArrayElement` is not implemented for `f32`

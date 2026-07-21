@@ -1,5 +1,5 @@
 error[E0080]: evaluation panicked: Failed to implement `ShaderLayout`: struct `SizeUnaligned` size (12) must be equal to its shader size (16), i.e. rounded up to its `ALIGN` (16)
- --> tests/compile_fail/struct_size_unaligned.rs:3:1
+ --> compile_fail/struct_size_unaligned.rs:3:1
   |
 3 | / shader_layout! {
 4 | |

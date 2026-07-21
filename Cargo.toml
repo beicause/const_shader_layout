@@ -22,12 +22,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 [workspace]
 members = ["derive", "tests"]
 
-[[test]]
-harness = false
-name = "compile"
-path = "tests/compile.rs"
-required-features = ["derive", "glam", "half", "std"]
-
 [dependencies]
 const_shader_layout_derive = {
   path = "derive",

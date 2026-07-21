@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `Vec3: ShaderLayoutArrayElement` is not satisfied
- --> tests/compile_fail/vec3_array.rs:5:13
+ --> compile_fail/vec3_array.rs:5:13
   |
 5 |         a4: [glam::Vec3; 1],
   |             ^^^^^^^^^^^^^^^ the trait `ShaderLayoutArrayElement` is not implemented for `Vec3`
@@ -17,7 +17,7 @@ error[E0277]: the trait bound `Vec3: ShaderLayoutArrayElement` is not satisfied
   = note: required for `[Vec3; 1]` to implement `ShaderLayout`
 
 error[E0277]: the trait bound `IVec3: ShaderLayoutArrayElement` is not satisfied
-  --> tests/compile_fail/vec3_array.rs:12:13
+  --> compile_fail/vec3_array.rs:12:13
    |
 12 |         a4: [glam::IVec3; 1],
    |             ^^^^^^^^^^^^^^^^ the trait `ShaderLayoutArrayElement` is not implemented for `IVec3`
@@ -35,7 +35,7 @@ error[E0277]: the trait bound `IVec3: ShaderLayoutArrayElement` is not satisfied
    = note: required for `[IVec3; 1]` to implement `ShaderLayout`
 
 error[E0277]: the trait bound `UVec3: ShaderLayoutArrayElement` is not satisfied
-  --> tests/compile_fail/vec3_array.rs:19:13
+  --> compile_fail/vec3_array.rs:19:13
    |
 19 |         a4: [glam::UVec3; 1],
    |             ^^^^^^^^^^^^^^^^ the trait `ShaderLayoutArrayElement` is not implemented for `UVec3`

@@ -1,5 +1,5 @@
 error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutArrayElement`: `[Vec3; N]` size (12 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16)
-  --> tests/compile_fail/custom_impl_array.rs:21:5
+  --> compile_fail/custom_impl_array.rs:21:5
    |
 21 |     impl_shader_layout_array_element!(Vec3);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `standard::_` failed here
@@ -7,7 +7,7 @@ error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutArrayElement
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_array_element` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutCompatArrayElement`: `[Vec2; N]` size (8 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16) and 16
-  --> tests/compile_fail/custom_impl_array.rs:31:5
+  --> compile_fail/custom_impl_array.rs:31:5
    |
 31 |     impl_shader_layout_compat_array_element!(Vec2);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here
@@ -15,7 +15,7 @@ error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutCompatArrayE
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_compat_array_element` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutArrayElement`: `[Vec3; N]` size (12 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16)
-  --> tests/compile_fail/custom_impl_array.rs:34:5
+  --> compile_fail/custom_impl_array.rs:34:5
    |
 34 |     impl_shader_layout_compat_array_element!(Vec3);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here
@@ -23,7 +23,7 @@ error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutArrayElement
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `impl_shader_layout_compat_array_element` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error[E0080]: evaluation panicked: Failed to implement `ShaderLayoutCompatArrayElement`: `[Vec3; N]` size (12 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16) and 16
-  --> tests/compile_fail/custom_impl_array.rs:34:5
+  --> compile_fail/custom_impl_array.rs:34:5
    |
 34 |     impl_shader_layout_compat_array_element!(Vec3);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `compat::_` failed here

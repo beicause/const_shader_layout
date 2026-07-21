@@ -3,9 +3,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-// Re-export ui_test so all the tests use the same version.
-pub use ui_test;
-
 use ui_test::{
     Args, Config, bless_output_files,
     color_eyre::eyre::eyre,
@@ -147,5 +144,5 @@ pub fn test_with_multiple_configs(
 }
 
 fn main() -> ui_test::color_eyre::Result<()> {
-    test_multiple("ui_test", ["tests/compile_fail", "tests/compile_pass"])
+    test_multiple("ui_test", ["compile_fail", "compile_pass"])
 }
