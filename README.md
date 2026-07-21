@@ -32,35 +32,37 @@ shader_layout! {
 use const_shader_layout::{shader_layout, shader_layout_compat, ShaderLayout, ShaderLayoutCompat};
 use glam::{Vec2, Vec3, Vec4};
 
-// Use derive proc-macros
+// Use declarative macro
+shader_layout! {
+    pub struct MyStorage {
+        a1: f32,
+        a2: [f32; 2],
+        a3: [f32; 1],
+        a4: Vec3,
+        a5: f32,
+        a6: Vec3,
+        p1: f32, // Padding needed otherwise struct size (44) won't match shader size (48).
+    }
+}
+
+// Or use proc-macro
 #[derive(Clone, Copy, ShaderLayout)]
 #[repr(C)]
-pub struct MyStorage {
-    a1: f32,
-    a2: [f32; 2],
-    a3: [f32; 1],
-    a4: Vec3,
-    a5: f32,
-    a6: Vec3,
-    p1: f32, // Padding needed otherwise struct size (44) won't match shader size (48).
+pub struct Nested {
+    a1: [Vec4; 2],
+    a2: Vec3,
+    a3: f32
 }
 
-// Or use declarative macros
-shader_layout_compat! {
-    pub struct Nested {
-        a1: [Vec4; 2],
-        a2: Vec3,
-        a3: f32
-    }
+
+#[derive(Clone, Copy, ShaderLayout)]
+#[repr(C)]
+pub struct MyUniform {
+    a1: Nested,
+    a2: Vec3,
+    // Padding is implicit, because struct size is 64 aligned to 16 in `repr(C)` which matches shader size (64).
 }
 
-shader_layout_compat! {
-    pub struct MyUniform {
-        a1: Nested,
-        a2: Vec3,
-        // Padding is implicit, because struct size is 64 aligned to 16 in `repr(C)` which matches shader size (64).
-    }
-}
 ```
 
 See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what this supports and checks.
