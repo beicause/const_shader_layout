@@ -1,4 +1,4 @@
-error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned::a1` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
+error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned::a1` (`Nested`) size (4) must be `SIZE_CONSTRAINT` (16) due to uniform layout constraints
   --> compile_fail/struct_align_compat.rs:9:1
    |
  9 | / shader_layout_compat! {
@@ -11,7 +11,7 @@ error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `C
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the macro `shader_layout_compat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned2::a2` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
+error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned2::a2` (`Nested`) size (4) must be `SIZE_CONSTRAINT` (16) due to uniform layout constraints
   --> compile_fail/struct_align_compat.rs:17:1
    |
 17 | / shader_layout_compat! {

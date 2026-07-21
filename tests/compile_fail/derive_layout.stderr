@@ -48,7 +48,7 @@ error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satis
            and 4 others
    = note: required for `[f32; 1]` to implement `ShaderLayoutCompat`
 
-error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned::a1` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
+error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned::a1` (`Nested`) size (4) must be `SIZE_CONSTRAINT` (16) due to uniform layout constraints
   --> compile_fail/derive_layout.rs:56:23
    |
 56 | #[derive(Clone, Copy, ShaderLayoutCompat)]
@@ -56,7 +56,7 @@ error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `C
    |
    = note: this error originates in the macro `$crate::panic::panic_2021` which comes from the expansion of the derive macro `ShaderLayoutCompat` (in Nightly builds, run with -Z macro-backtrace for more info)
 
-error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned2::a2` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints
+error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned2::a2` (`Nested`) size (4) must be `SIZE_CONSTRAINT` (16) due to uniform layout constraints
   --> compile_fail/derive_layout.rs:64:23
    |
 64 | #[derive(Clone, Copy, ShaderLayoutCompat)]

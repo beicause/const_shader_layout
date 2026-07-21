@@ -1,6 +1,6 @@
 [package]
 name = "const_shader_layout"
-version = "0.3.4"
+version = "0.4.0-dev"
 edition = "2024"
 description = "Compile-time checks to ensure structs conform to WGSL's memory layout rules"
 repository = "https://github.com/beicause/const_shader_layout"
@@ -25,7 +25,7 @@ members = ["derive", "tests"]
 [dependencies]
 const_shader_layout_derive = {
   path = "derive",
-  version = "0.1",
+  version = "0.2.0-dev",
   optional = true
 }
 glam = {

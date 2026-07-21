@@ -15,7 +15,7 @@ shader_layout! {
 }
 
 shader_layout_compat! {
-    //~^ ERROR: Failed to impl `ShaderLayoutCompat`: field `Compat::a2` (`Vec2ArrayLen3`) size (24) must be `SIZE_COMPAT` (48) due to uniform layout constraints
+    //~^ ERROR: Failed to impl `ShaderLayoutCompat`: field `Compat::a2` (`Vec2ArrayLen3`) size (24) must be `SIZE_CONSTRAINT` (48) due to uniform layout constraints
     pub struct Compat {
         a1: glam::Vec2,
         a2: Vec2ArrayLen3,
