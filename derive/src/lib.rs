@@ -53,12 +53,12 @@ fn has_repr_c_or_transparent(input: &TokenStream) -> bool {
         if paren.delimiter() != Delimiter::Parenthesis {
             continue;
         }
-        let mut paren_inner = paren.stream().into_iter();
-        let Some(TokenTree::Ident(c)) = paren_inner.next() else {
-            continue;
-        };
-        if ["C", "transparent"].contains(&c.to_string().as_str()) {
-            return true;
+        for token in paren.stream() {
+            if let TokenTree::Ident(c) = token
+                && ["C", "transparent"].contains(&c.to_string().as_str())
+            {
+                return true;
+            }
         }
     }
     false
