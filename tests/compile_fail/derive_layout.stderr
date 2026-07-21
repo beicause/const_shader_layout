@@ -45,7 +45,7 @@ error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satis
              Reverse<T>
              Saturating<T>
              UVec4
-           and 3 others
+           and 4 others
    = note: required for `[f32; 1]` to implement `ShaderLayoutCompat`
 
 error[E0080]: evaluation panicked: Failed to impl `ShaderLayoutCompat`: field `CompatSizeUnaligned::a1` (`Nested`) size (4) must be `SIZE_COMPAT` (16) due to uniform layout constraints

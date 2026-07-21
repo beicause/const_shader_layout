@@ -13,7 +13,7 @@ error[E0277]: the trait bound `Vec3: ShaderLayoutArrayElement` is not satisfied
             Mat3A
             Mat4
             NonZero<i16>
-          and 23 others
+          and 24 others
   = note: required for `[Vec3; 1]` to implement `ShaderLayout`
 
 error[E0277]: the trait bound `IVec3: ShaderLayoutArrayElement` is not satisfied
@@ -31,7 +31,7 @@ error[E0277]: the trait bound `IVec3: ShaderLayoutArrayElement` is not satisfied
              Mat3A
              Mat4
              NonZero<i16>
-           and 23 others
+           and 24 others
    = note: required for `[IVec3; 1]` to implement `ShaderLayout`
 
 error[E0277]: the trait bound `UVec3: ShaderLayoutArrayElement` is not satisfied
@@ -49,7 +49,7 @@ error[E0277]: the trait bound `UVec3: ShaderLayoutArrayElement` is not satisfied
              Mat3A
              Mat4
              NonZero<i16>
-           and 23 others
+           and 24 others
    = note: required for `[UVec3; 1]` to implement `ShaderLayout`
 
 error: aborting due to 3 previous errors

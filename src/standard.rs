@@ -17,6 +17,7 @@ impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayout for [T; N] {
     const ALIGN: core::num::NonZero<u64> =
         core::num::NonZero::new(align_of::<Self>() as u64).unwrap();
 }
+impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayoutArrayElement for [T; N] {}
 
 /// Implements [`ShaderLayout`] for the primitive types, with their original alignment.
 #[macro_export]

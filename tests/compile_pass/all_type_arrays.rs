@@ -100,6 +100,10 @@ shader_layout! {
         reverse_f32_arr: [Reverse<f32>; 2],
         reverse_i32_arr: [Reverse<i32>; 2],
         reverse_u32_arr: [Reverse<u32>; 2],
+
+        // Array in array
+        array_in_array_f32: [[f32;2]; 2],
+        array_in_array_vec3a: [[Vec3A; 2]; 2],
     }
 }
 
@@ -120,5 +124,9 @@ shader_layout_compat! {
 
         // Nested compat struct
         nested_compat_arr: [NestedCompat; 2],
+
+        // Array in array
+        array_in_array_vec4: [[Vec4; 3]; 4],
+        array_in_array_vec3a: [[Vec3A; 4]; 3],
     }
 }
