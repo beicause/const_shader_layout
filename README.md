@@ -5,8 +5,8 @@
 [![Cargo](https://img.shields.io/crates/v/const_shader_layout.svg)](https://crates.io/crates/const_shader_layout)
 [![Documentation](https://docs.rs/const_shader_layout/badge.svg)](https://docs.rs/const_shader_layout)
 
-The core of this crate is the [`shader_layout`], [`shader_layout_compat`] declarative macros
-(or corresponding derive macros if `derive` feature is enabled) and the [`ShaderLayout`], [`ShaderLayoutCompat`] traits.
+The core of this crate is the [`ShaderLayout`], [`ShaderLayoutCompat`] derive proc-macros
+(or declarative macros if `derive` feature is disabled), and the [`ShaderLayout`], [`ShaderLayoutCompat`] traits.
 
 `ShaderLayout` corresponds to <https://www.w3.org/TR/WGSL/#alignment-and-size>.
 
@@ -32,18 +32,20 @@ shader_layout! {
 use const_shader_layout::{shader_layout, shader_layout_compat, ShaderLayout, ShaderLayoutCompat};
 use glam::{Vec2, Vec3, Vec4};
 
-shader_layout! {
-    pub struct MyStorage {
-        a1: f32,
-        a2: [f32; 2],
-        a3: [f32; 1],
-        a4: Vec3,
-        a5: f32,
-        a6: Vec3,
-        p1: f32, // Padding needed otherwise struct size (44) won't match shader size (48).
-    }
+// Use derive proc-macros
+#[derive(Clone, Copy, ShaderLayout)]
+#[repr(C)]
+pub struct MyStorage {
+    a1: f32,
+    a2: [f32; 2],
+    a3: [f32; 1],
+    a4: Vec3,
+    a5: f32,
+    a6: Vec3,
+    p1: f32, // Padding needed otherwise struct size (44) won't match shader size (48).
 }
 
+// Or use declarative macros
 shader_layout_compat! {
     pub struct Nested {
         a1: [Vec4; 2],
@@ -67,7 +69,7 @@ See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what
 
 | Feature | Description |
 |---------|-------------|
-| `derive` | Enable `ShaderLayout`, `ShaderLayoutCompat` derive macros  |
+| `derive`(default) | Enable `ShaderLayout`, `ShaderLayoutCompat` derive macros  |
 | `glam` (default) | Implements `ShaderLayout`/`ShaderLayoutCompat` for `glam` types |
 | `half` | Implements `ShaderLayout`/`ShaderLayoutCompat` for `half::f16` and array of it |
 | `std` (default), `libm`, `nostd-libm` | Re-export `glam`'s corresponding features |

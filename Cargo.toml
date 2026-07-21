@@ -37,7 +37,7 @@ glam = {
 half = { version = "2", default-features = false, optional = true }
 
 [features]
-default = ["glam", "std"]
+default = ["derive", "glam", "std"]
 
 # Enables derive macros `ShaderLayout` and `ShaderLayoutCompat`.
 derive = ["dep:const_shader_layout_derive"]
