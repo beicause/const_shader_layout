@@ -1,26 +1,23 @@
 use proc_macro::{Delimiter, Group, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
 
-fn path<'a>(segments: &'a [&'a str]) -> impl Iterator<Item = TokenTree> + 'a {
-    segments.iter().enumerate().flat_map(move |(i, seg)| {
-        let mut v = Vec::new();
+fn path<'a>(segments: &'a [&'a str]) -> TokenStream {
+    let mut out = TokenStream::new();
+    for (i, seg) in segments.iter().enumerate() {
         if i > 0 {
-            v.push(TokenTree::Punct(Punct::new(':', Spacing::Joint)));
-            v.push(TokenTree::Punct(Punct::new(':', Spacing::Alone)));
+            out.extend([
+                TokenTree::Punct(Punct::new(':', Spacing::Joint)),
+                TokenTree::Punct(Punct::new(':', Spacing::Alone)),
+            ]);
         }
-        v.push(TokenTree::Ident(Ident::new(seg, Span::call_site())));
-        v
-    })
+        out.extend([TokenTree::Ident(Ident::new(seg, Span::call_site()))]);
+    }
+    out
 }
 
-fn macro_invocation(
-    path_tokens: impl IntoIterator<Item = TokenTree>,
-    body: TokenStream,
-) -> TokenStream {
-    let mut out = TokenStream::new();
-    out.extend(path_tokens);
-    out.extend([TokenTree::Punct(Punct::new('!', Spacing::Alone))]);
-    out.extend([TokenTree::Group(Group::new(Delimiter::Brace, body))]);
-    out
+fn macro_invocation(mut path_tokens: TokenStream, body: TokenStream) -> TokenStream {
+    path_tokens.extend([TokenTree::Punct(Punct::new('!', Spacing::Alone))]);
+    path_tokens.extend([TokenTree::Group(Group::new(Delimiter::Brace, body))]);
+    path_tokens
 }
 
 fn compile_error(msg: &str) -> TokenStream {
