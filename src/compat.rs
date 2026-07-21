@@ -15,6 +15,13 @@ pub trait ShaderLayoutCompat: ShaderLayout {
         core::num::NonZero::new(size_of::<Self>() as u64).unwrap();
 }
 
+/// Marks the type can be used as array element with uniform address layout constraints.
+///
+/// There is a blanket implementation of `ShaderLayoutCompat` for `[T; N]` where `T: ShaderLayoutCompatArrayElement`.
+pub trait ShaderLayoutCompatArrayElement: crate::ShaderLayoutArrayElement {}
+
+impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompat for [T; N] {}
+
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the primitive types, with their original alignment.
 #[macro_export]
 #[doc(hidden)]
@@ -59,56 +66,6 @@ macro_rules! impl_shader_layout_compat {
     };
 }
 
-/// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for a custom array type for elements implemented [`ShaderLayoutCompat`].
-///
-/// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.
-///
-/// Checks at compile-time:
-/// * Array size must be equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`.
-///
-/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
-#[macro_export]
-#[doc(hidden)]
-macro_rules! impl_shader_layout_custom_array_compat {
-    ($elem_ty:ty, $array_ty:ty, $n:expr) => {
-        $crate::impl_shader_layout_custom_array!($elem_ty, $array_ty, $n);
-        impl $crate::ShaderLayoutCompat for $array_ty {
-            const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                <$elem_ty as $crate::ShaderLayout>::ALIGN
-                    .get()
-                    .next_multiple_of(16),
-            )
-            .unwrap();
-            const SIZE_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                (size_of::<$elem_ty>() as u64)
-                    .next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
-                    .next_multiple_of(16)
-                    * $n as u64,
-            )
-            .unwrap();
-        }
-
-        // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
-        const _: () = {
-            const N: usize = $n;
-            const SIZE: u64 = <$array_ty as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
-            if SIZE != size_of::<$array_ty>() as u64 {
-                let mut msg = $crate::internal::MsgBuf::<256>::new();
-                msg.write_str("Failed to implement `ShaderLayoutCompat`: array `")
-                    .write_str(stringify!($array_ty))
-                    .write_str("` size (")
-                    .write_usize(size_of::<$array_ty>())
-                    .write_str(") must be equal to its shader size (")
-                    .write_u64(SIZE)
-                    .write_str("), i.e. the stride must be rounded up to `ALIGN` (")
-                    .write_u64(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
-                    .write_str(") and 16");
-                panic!("{}", msg.as_str());
-            }
-        };
-    };
-}
-
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for `[T; N]` for types implemented [`ShaderLayoutCompat`].
 ///
 /// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.
@@ -119,28 +76,21 @@ macro_rules! impl_shader_layout_custom_array_compat {
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 #[macro_export]
 #[doc(hidden)]
-macro_rules! impl_shader_layout_array_compat {
+macro_rules! impl_shader_layout_compat_array_element {
     ($($ty:ty),+$(,)?) => {
         $(
-            $crate::impl_shader_layout_array!($ty);
-            impl<const N: usize> $crate::ShaderLayoutCompat for [$ty; N]
-            {
-                const ALIGN_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                    <$ty as $crate::ShaderLayout>::ALIGN.get().next_multiple_of(16)
-                ).unwrap();
-                const SIZE_COMPAT: ::core::num::NonZero<u64> = ::core::num::NonZero::new(
-                    (size_of::<$ty>() as u64).next_multiple_of(<$ty as $crate::ShaderLayout>::ALIGN.get()).next_multiple_of(16) * N as u64
-                ).unwrap();
-            }
+            $crate::impl_shader_layout_array_element!($ty);
+            impl $crate::ShaderLayoutCompatArrayElement for $ty {}
 
             // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
             const _: () = {
-                const ELEMENT_ALIGN: u64 = <$ty as $crate::ShaderLayout>::ALIGN.get();
+                const ELEMENT_ALIGN: u64 = <$ty as $crate::ShaderLayout>::ALIGN.get().next_multiple_of(16);
                 const N: usize = 1;
-                const SIZE: u64 = <[$ty; N] as $crate::ShaderLayoutCompat>::SIZE_COMPAT.get();
-                if SIZE != size_of::<[$ty; N]>() as u64 {
+                const ACTUAL_SIZE: u64 = size_of::<[$ty; N]>() as u64;
+                const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(ELEMENT_ALIGN) * N as u64;
+                if SIZE != ACTUAL_SIZE {
                     let mut msg = $crate::internal::MsgBuf::<256>::new();
-                    msg.write_str("`[")
+                    msg.write_str("Failed to implement `ShaderLayoutCompatArrayElement`: `[")
                         .write_str(stringify!($ty))
                         .write_str("; N]` size (")
                         .write_usize(size_of::<[$ty; N]>())

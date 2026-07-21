@@ -8,6 +8,16 @@ pub trait ShaderLayout: Clone + Copy + 'static {
     const ALIGN: core::num::NonZero<u64>;
 }
 
+/// Marks the type can be used as array element.
+///
+/// There is a blanket implementation of `ShaderLayout` for `[T; N]` where `T: ShaderLayoutArrayElement`.
+pub trait ShaderLayoutArrayElement: Clone + Copy + 'static {}
+
+impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayout for [T; N] {
+    const ALIGN: core::num::NonZero<u64> =
+        core::num::NonZero::new(align_of::<Self>() as u64).unwrap();
+}
+
 /// Implements [`ShaderLayout`] for the primitive types, with their original alignment.
 #[macro_export]
 #[doc(hidden)]
@@ -32,43 +42,6 @@ macro_rules! impl_shader_layout {
     };
 }
 
-/// Implements [`ShaderLayout`] for a custom array type for elements implemented [`ShaderLayout`].
-///
-/// Checks at compile-time:
-/// * Array size must be equal to `N * roundUp(AlignOf(E), SizeOf(E))`.
-///
-/// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
-#[macro_export]
-#[doc(hidden)]
-macro_rules! impl_shader_layout_custom_array {
-    ($elem_ty:ty, $array_ty:ty, $n:expr) => {
-        impl $crate::ShaderLayout for $array_ty {
-            const ALIGN: ::core::num::NonZero<u64> = <$elem_ty as $crate::ShaderLayout>::ALIGN;
-        }
-
-        // Assert array size is equal to `N * roundUp(AlignOf(E), SizeOf(E))`
-        const _: () = {
-            const N: usize = $n;
-            const SIZE: u64 = (size_of::<$elem_ty>() as u64)
-                .next_multiple_of(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
-                * N as u64;
-            if SIZE != size_of::<$array_ty>() as u64 {
-                let mut msg = $crate::internal::MsgBuf::<256>::new();
-                msg.write_str("Failed to implement `ShaderLayout`: array `")
-                    .write_str(stringify!($array_ty))
-                    .write_str("` size (")
-                    .write_usize(size_of::<$array_ty>())
-                    .write_str(") must be equal to its shader size (")
-                    .write_u64(SIZE)
-                    .write_str("), i.e. the stride must be rounded up to `ALIGN` (")
-                    .write_u64(<$elem_ty as $crate::ShaderLayout>::ALIGN.get())
-                    .write_str(")");
-                panic!("{}", msg.as_str());
-            }
-        };
-    };
-}
-
 /// Implements [`ShaderLayout`] for `[T; N]` for types implemented [`ShaderLayout`].
 ///
 /// Checks at compile-time:
@@ -77,13 +50,10 @@ macro_rules! impl_shader_layout_custom_array {
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 #[macro_export]
 #[doc(hidden)]
-macro_rules! impl_shader_layout_array {
+macro_rules! impl_shader_layout_array_element {
     ($($ty:ty),+$(,)?) => {
         $(
-            impl<const N: usize> $crate::ShaderLayout for [$ty; N]
-            {
-                const ALIGN: ::core::num::NonZero<u64> = <$ty as $crate::ShaderLayout>::ALIGN;
-            }
+            impl $crate::ShaderLayoutArrayElement for $ty {}
 
             // Assert array size is equal to `N * roundUp(AlignOf(E), SizeOf(E))`
             const _: () = {
@@ -93,7 +63,7 @@ macro_rules! impl_shader_layout_array {
                 const SIZE: u64 = (size_of::<$ty>() as u64).next_multiple_of(ELEMENT_ALIGN) * N as u64;
                 if SIZE != ACTUAL_SIZE {
                     let mut msg = $crate::internal::MsgBuf::<256>::new();
-                    msg.write_str("`[")
+                    msg.write_str("Failed to implement `ShaderLayoutArrayElement`: `[")
                         .write_str(stringify!($ty))
                         .write_str("; N]` size (")
                         .write_usize(size_of::<[$ty; N]>())
@@ -194,5 +164,7 @@ macro_rules! shader_layout {
                 panic!("{}", msg.as_str());
             }
         };
+
+        impl $crate::ShaderLayoutArrayElement for $struct_name {}
     };
 }

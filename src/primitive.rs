@@ -1,6 +1,6 @@
 use core::num::{NonZero, Wrapping};
 
-use crate::{impl_shader_layout_array, impl_shader_layout_compat_primitive};
+use crate::{impl_shader_layout_array_element, impl_shader_layout_compat_primitive};
 
 // Scalar
 impl_shader_layout_compat_primitive!(
@@ -21,7 +21,7 @@ impl_shader_layout_compat_primitive!(
 );
 
 // Array
-impl_shader_layout_array!(
+impl_shader_layout_array_element!(
     i16,
     u16,
     NonZero<i16>,
