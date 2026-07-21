@@ -20,9 +20,6 @@ pub trait ShaderLayoutCompat: ShaderLayout {
 /// There is a blanket implementation of `ShaderLayoutCompat` for `[T; N]` where `T: ShaderLayoutCompatArrayElement`.
 pub trait ShaderLayoutCompatArrayElement: crate::ShaderLayoutArrayElement {}
 
-impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompat for [T; N] {}
-impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompatArrayElement for [T; N] {}
-
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for the types, with the specified alignment.
 #[macro_export]
 #[doc(hidden)]

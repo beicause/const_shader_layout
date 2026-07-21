@@ -17,9 +17,6 @@ pub trait ShaderLayout: Clone + Copy + 'static {
 /// There is a blanket implementation of `ShaderLayout` for `[T; N]` where `T: ShaderLayoutArrayElement`.
 pub trait ShaderLayoutArrayElement: Clone + Copy + 'static {}
 
-impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayout for [T; N] {}
-impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayoutArrayElement for [T; N] {}
-
 /// Implements [`ShaderLayout`] for the types, with the specified alignment.
 #[macro_export]
 #[doc(hidden)]

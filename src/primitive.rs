@@ -1,7 +1,10 @@
 use core::cmp::Reverse;
 use core::num::{NonZero, Saturating, Wrapping};
 
-use crate::{impl_shader_layout_array_element, impl_shader_layout_compat};
+use crate::{
+    ShaderLayout, ShaderLayoutArrayElement, ShaderLayoutCompat, ShaderLayoutCompatArrayElement,
+    impl_shader_layout_array_element, impl_shader_layout_compat,
+};
 
 // Scalar
 impl_shader_layout_compat!(
@@ -29,16 +32,22 @@ impl_shader_layout_array_element!(
     NonZero<u32>,
 );
 
+impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompat for [T; N] {}
+impl<T: ShaderLayoutCompatArrayElement, const N: usize> ShaderLayoutCompatArrayElement for [T; N] {}
+
+impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayout for [T; N] {}
+impl<T: ShaderLayoutArrayElement, const N: usize> ShaderLayoutArrayElement for [T; N] {}
+
 macro_rules! impl_transparent_generic_wrapper {
     ($($ty:ty),+$(,)?) => {
         $(
-            impl<T: crate::ShaderLayout> crate::ShaderLayout for $ty {
+            impl<T: ShaderLayout> ShaderLayout for $ty {
                 const ALIGN: NonZero<u64> = NonZero::new(align_of::<T>() as u64).unwrap();
             }
-            impl<T: crate::ShaderLayoutCompat> crate::ShaderLayoutCompat for $ty {}
+            impl<T: ShaderLayoutCompat> ShaderLayoutCompat for $ty {}
 
-            impl<T: crate::ShaderLayoutArrayElement> crate::ShaderLayoutArrayElement for $ty {}
-            impl<T: crate::ShaderLayoutCompatArrayElement> crate::ShaderLayoutCompatArrayElement
+            impl<T: ShaderLayoutArrayElement> ShaderLayoutArrayElement for $ty {}
+            impl<T: ShaderLayoutCompatArrayElement> ShaderLayoutCompatArrayElement
                 for $ty
             {}
         )+
