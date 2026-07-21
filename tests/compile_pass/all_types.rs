@@ -7,6 +7,18 @@ use glam::{
 };
 
 shader_layout! {
+    pub struct NestedStd {
+        a1: f32,
+    }
+}
+
+shader_layout_compat! {
+    pub struct NestedCompat {
+        a1: Vec4,
+    }
+}
+
+shader_layout! {
     pub struct AllTypes {
         a1: half::f16,
         a2: i16,
@@ -50,6 +62,9 @@ shader_layout! {
         p7: [u32; 2],
         a33: Vec3,
         a34: Vec4,
+        a35: NestedStd,
+        p8: [u32;3],
+        a36: NestedCompat,
     }
 }
 
@@ -97,5 +112,6 @@ shader_layout_compat! {
         p7: Vec2,
         a33: Vec3,
         a34: Vec4,
+        a35: NestedCompat,
     }
 }

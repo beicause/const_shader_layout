@@ -1,11 +1,24 @@
 //@check-pass
-use const_shader_layout::{shader_layout, shader_layout_compat};
+use const_shader_layout::{ShaderLayoutCompatArrayElement, shader_layout, shader_layout_compat};
 use core::num::{NonZero, Wrapping};
 use glam::{
     I16Vec2, I16Vec4, IVec2, IVec4, Mat2, Mat3A, Mat4, Quat, U16Vec2, U16Vec4, UVec2, UVec4, Vec2,
-    Vec4,
+    Vec3A, Vec4,
 };
 use half::f16;
+
+shader_layout! {
+    pub struct NestedStd {
+        a1: f32,
+    }
+}
+
+shader_layout_compat! {
+    pub struct NestedCompat {
+        a1: Vec4,
+    }
+}
+impl ShaderLayoutCompatArrayElement for NestedCompat {}
 
 shader_layout! {
     pub struct AllTypeArrays {
@@ -46,7 +59,11 @@ shader_layout! {
         a31: [UVec4; 2],
         a32: [Vec2; 2],
         // a33: [Vec3; 2],
-        a34: [Vec4; 2],
+        a34: [Vec3A; 2],
+        a35: [Vec4; 2],
+        a36: [NestedStd; 2],
+        p4: [u32;2],
+        a37: [NestedCompat; 2],
     }
 }
 
@@ -89,6 +106,8 @@ shader_layout_compat! {
         a31: [UVec4; 2],
         // a32: [Vec2; 2],
         // a33: [Vec3; 2],
-        a34: [Vec4; 2],
+        a34: [Vec3A; 2],
+        a35: [Vec4; 2],
+        a36: [NestedCompat; 2],
     }
 }

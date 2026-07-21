@@ -1,17 +1,19 @@
-error[E0277]: the trait bound `[f32; 1]: ShaderLayoutCompat` is not satisfied
+error[E0277]: the trait bound `f32: ShaderLayoutCompatArrayElement` is not satisfied
  --> tests/compile_fail/array_align_compat.rs:5:13
   |
 5 |         a1: [f32; 1],
-  |             ^^^^^^^^ the trait `ShaderLayoutCompat` is not implemented for `[f32; 1]`
+  |             ^^^^^^^^ the trait `ShaderLayoutCompatArrayElement` is not implemented for `f32`
   |
-  = help: the following other types implement trait `ShaderLayoutCompat`:
-            [glam::f32::sse2::mat2::Mat2; N]
-            [glam::f32::sse2::mat3a::Mat3A; N]
-            [glam::f32::sse2::mat4::Mat4; N]
-            [glam::f32::sse2::quat::Quat; N]
-            [glam::f32::sse2::vec4::Vec4; N]
-            [glam::i32::ivec4::IVec4; N]
-            [glam::u32::uvec4::UVec4; N]
+  = help: the following other types implement trait `ShaderLayoutCompatArrayElement`:
+            glam::f32::sse2::mat2::Mat2
+            glam::f32::sse2::mat3a::Mat3A
+            glam::f32::sse2::mat4::Mat4
+            glam::f32::sse2::quat::Quat
+            glam::f32::sse2::vec3a::Vec3A
+            glam::f32::sse2::vec4::Vec4
+            glam::i32::ivec4::IVec4
+            glam::u32::uvec4::UVec4
+  = note: required for `[f32; 1]` to implement `ShaderLayoutCompat`
 
 error: aborting due to 1 previous error
 
