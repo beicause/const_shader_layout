@@ -24,7 +24,7 @@ members = ["derive", "tests"]
 
 [dependencies]
 const_shader_layout_derive = {
-  path = "derive",
+  path = "./derive",
   version = "0.2.0",
   optional = true
 }

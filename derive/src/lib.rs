@@ -86,3 +86,38 @@ pub fn derive_shader_layout_compat(input: TokenStream) -> TokenStream {
         input,
     )
 }
+
+/// Returns the identifier of the struct definition in the input,
+/// i.e. the identifier right after the `struct` keyword.
+fn struct_ident(input: &TokenStream) -> Option<Ident> {
+    let mut tokens = input.clone().into_iter();
+    while let Some(token) = tokens.next() {
+        let TokenTree::Ident(ident) = token else {
+            continue;
+        };
+        if ident.to_string() != "struct" {
+            continue;
+        }
+        return match tokens.next() {
+            Some(TokenTree::Ident(struct_name)) => Some(struct_name),
+            _ => None,
+        };
+    }
+    None
+}
+
+#[proc_macro_derive(ShaderLayoutCompatArrayElement)]
+pub fn derive_shader_layout_compat_array_element(input: TokenStream) -> TokenStream {
+    // `impl_shader_layout_compat_array_element!` expects type identifiers,
+    // not the whole struct definition, so extract the struct's identifier.
+    let Some(struct_name) = struct_ident(&input) else {
+        return compile_error("`ShaderLayoutCompatArrayElement` can only be derived for structs");
+    };
+    macro_invocation(
+        path(&[
+            "const_shader_layout",
+            "impl_shader_layout_compat_array_element",
+        ]),
+        TokenStream::from(TokenTree::Ident(struct_name)),
+    )
+}

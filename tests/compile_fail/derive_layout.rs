@@ -1,4 +1,4 @@
-use const_shader_layout::{ShaderLayout, ShaderLayoutCompat};
+use const_shader_layout::{ShaderLayout, ShaderLayoutCompat, ShaderLayoutCompatArrayElement};
 
 #[derive(Clone, Copy, ShaderLayout)]
 //~^ ERROR: Struct must be `#[repr(C)]` or `#[repr(transparent)]` for `ShaderLayout`
@@ -21,6 +21,13 @@ pub struct ReprTransparent {
 #[derive(Clone, Copy, ShaderLayoutCompat)]
 #[repr(transparent)]
 pub struct CompatReprTransparent {
+    x: f32,
+}
+
+#[derive(Clone, Copy, ShaderLayoutCompat, ShaderLayoutCompatArrayElement)]
+//~^ ERROR: evaluation panicked: Failed to implement `ShaderLayoutCompatArrayElement`: `[CompatReprTransparentArrayElement; N]` size (4 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16) and 16
+#[repr(transparent)]
+pub struct CompatReprTransparentArrayElement {
     x: f32,
 }
 
@@ -66,4 +73,11 @@ pub struct CompatSizeUnaligned {
 pub struct CompatSizeUnaligned2 {
     a1: f32,
     a2: Nested,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, ShaderLayoutCompat, ShaderLayoutCompatArrayElement)]
+pub struct CompatSizeAligned {
+    a0: Vec3,
+    a1: f32,
 }

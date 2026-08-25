@@ -12,7 +12,9 @@ pub use compat::*;
 
 #[cfg(feature = "derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "derive")))]
-pub use const_shader_layout_derive::{ShaderLayout, ShaderLayoutCompat};
+pub use const_shader_layout_derive::{
+    ShaderLayout, ShaderLayoutCompat, ShaderLayoutCompatArrayElement,
+};
 
 #[cfg(feature = "glam")]
 #[cfg_attr(docsrs, doc(cfg(feature = "glam")))]

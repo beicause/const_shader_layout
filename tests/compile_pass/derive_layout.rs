@@ -1,5 +1,5 @@
 //@check-pass
-use const_shader_layout::{ShaderLayout, ShaderLayoutCompat};
+use const_shader_layout::{ShaderLayout, ShaderLayoutCompat, ShaderLayoutCompatArrayElement};
 
 #[derive(Clone, Copy, ShaderLayout)]
 #[repr(transparent)]
@@ -29,7 +29,7 @@ pub struct WithPad {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, ShaderLayoutCompat)]
+#[derive(Clone, Copy, ShaderLayoutCompat, ShaderLayoutCompatArrayElement)]
 pub struct BasicCompat {
     x: f32,
     pad: f32,
@@ -38,7 +38,7 @@ pub struct BasicCompat {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, ShaderLayoutCompat)]
+#[derive(Clone, Copy, ShaderLayoutCompat, ShaderLayoutCompatArrayElement)]
 pub struct Vec4Aligned {
     a: glam::Vec4,
     b: glam::Vec4,

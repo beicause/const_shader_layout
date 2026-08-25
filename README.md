@@ -15,6 +15,10 @@ The core of this crate is the [`ShaderLayout`], [`ShaderLayoutCompat`] derive pr
 (without the `uniform_buffer_standard_layout` extension). Every type implementing `ShaderLayoutCompat`
 also implements `ShaderLayout`.
 
+`ShaderLayoutArrayElement` and `ShaderLayoutCompatArrayElement` mark whether the type can be used in `array<T, N>`/`array<T>`,
+as some types such as `[glam::Vec3; N]` isn't equal to `array<vec3f, N>` due to different alignment.
+`shader_layout!` automatically implements `ShaderLayoutArrayElement`. `ShaderLayoutCompat`, however, needs `impl_shader_layout_compat_array_element!` to manually implement `ShaderLayoutCompatArrayElement`.
+
 Both macros validate every field's alignment and the overall struct size at compile time. If a constraint
 is violated, compilation fails with a clear error message:
 
