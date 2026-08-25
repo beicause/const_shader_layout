@@ -1,6 +1,10 @@
 /// Marks the type's alignment requirement in shader.
 ///
-/// Note: The `size_of::<Self>` must be equal to its size in shader. Thus [`bool`] should not implement this.
+/// Use [`crate::shader_layout`] to implement this, which also implements [`ShaderLayoutArrayElement`].
+///
+/// Any [`ShaderLayout`] except primitive types like `Vec3` should also be [`ShaderLayoutArrayElement`].
+///
+/// The `size_of::<Self>` must be equal to its size in shader. Thus [`bool`] should not implement this.
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size>
 pub trait ShaderLayout: Clone + Copy + 'static {
@@ -13,6 +17,9 @@ pub trait ShaderLayout: Clone + Copy + 'static {
 }
 
 /// Marks the type can be used as array element.
+///
+/// This will be automatically implemented by [`crate::shader_layout`].
+/// Any [`ShaderLayout`] except primitive types like `Vec3` should also be [`ShaderLayoutArrayElement`].
 ///
 /// There is a blanket implementation of `ShaderLayout` for `[T; N]` where `T: ShaderLayoutArrayElement`.
 pub trait ShaderLayoutArrayElement: Clone + Copy + 'static {}

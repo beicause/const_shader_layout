@@ -2,6 +2,9 @@ use crate::ShaderLayout;
 
 /// Marks the type's uniform-compatible alignment requirement in shader, i.e. with uniform address layout constraints.
 ///
+/// Use [`crate::shader_layout_compat`] to implement this.
+/// Use [`crate::impl_shader_layout_compat_array_element`] to manually implement [`ShaderLayoutCompatArrayElement`] if needed.
+///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 pub trait ShaderLayoutCompat: ShaderLayout {
     /// The type's alignment constraint in shader if uniform address layout constraints apply when the type is in an array or struct.
@@ -16,6 +19,9 @@ pub trait ShaderLayoutCompat: ShaderLayout {
 }
 
 /// Marks the type can be used as array element with uniform address layout constraints.
+///
+/// Note: Use [`crate::impl_shader_layout_compat_array_element`] to manually implement this if needed.
+/// [`crate::shader_layout_compat`] doesn't automatically implement this.
 ///
 /// There is a blanket implementation of `ShaderLayoutCompat` for `[T; N]` where `T: ShaderLayoutCompatArrayElement`.
 pub trait ShaderLayoutCompatArrayElement: crate::ShaderLayoutArrayElement {}
@@ -67,7 +73,6 @@ macro_rules! impl_shader_layout_compat {
 ///
 /// See also <https://www.w3.org/TR/WGSL/#alignment-and-size> and <https://www.w3.org/TR/WGSL/#address-space-layout-constraints>
 #[macro_export]
-#[doc(hidden)]
 macro_rules! impl_shader_layout_compat_array_element {
     ($($ty:ty),+$(,)?) => {
         $(
