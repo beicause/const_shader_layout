@@ -25,15 +25,17 @@ mod standard {
 }
 
 mod compat {
-    use const_shader_layout::{impl_shader_layout_compat, impl_shader_layout_compat_array_element};
+    use const_shader_layout::{
+        impl_shader_layout_compat, primitive_impl_shader_layout_compat_array_element,
+    };
     define_vectors!();
 
-    impl_shader_layout_compat_array_element!(Vec2);
+    primitive_impl_shader_layout_compat_array_element!(Vec2);
     //~^ ERROR: Failed to implement `ShaderLayoutCompatArrayElement`: `[Vec2; N]` size (8 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16) and 16
 
-    impl_shader_layout_compat_array_element!(Vec3);
+    primitive_impl_shader_layout_compat_array_element!(Vec3);
     //~^ ERROR: Failed to implement `ShaderLayoutArrayElement`: `[Vec3; N]` size (12 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16)
     //~| ERROR: Failed to implement `ShaderLayoutCompatArrayElement`: `[Vec3; N]` size (12 * N) must be equal to its shader size (16 * N), i.e. the stride must be rounded up to `ALIGN` (16) and 16
 
-    impl_shader_layout_compat_array_element!(Vec4);
+    primitive_impl_shader_layout_compat_array_element!(Vec4);
 }

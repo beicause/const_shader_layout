@@ -6,7 +6,7 @@ use glam::{
 
 use crate::{
     impl_shader_layout_array_element, impl_shader_layout_compat,
-    impl_shader_layout_compat_array_element,
+    primitive_impl_shader_layout_compat_array_element,
 };
 
 // Vector
@@ -31,5 +31,5 @@ impl crate::ShaderLayoutArrayElement for Vec3A {}
 impl crate::ShaderLayoutCompatArrayElement for Vec3A {}
 
 // Only 16-byte aligned types should implement `ShaderLayoutCompatArrayElement`
-impl_shader_layout_compat_array_element!(IVec4, UVec4, Vec4, Quat);
-impl_shader_layout_compat_array_element!(Mat2, Mat3A, Mat4);
+primitive_impl_shader_layout_compat_array_element!(IVec4, UVec4, Vec4, Quat);
+primitive_impl_shader_layout_compat_array_element!(Mat2, Mat3A, Mat4);

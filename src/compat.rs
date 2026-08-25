@@ -64,6 +64,17 @@ macro_rules! impl_shader_layout_compat {
     };
 }
 
+#[macro_export]
+#[doc(hidden)]
+macro_rules! primitive_impl_shader_layout_compat_array_element {
+    ($($ty:ty),+$(,)?) => {
+        $(
+            $crate::impl_shader_layout_array_element!($ty);
+            $crate::impl_shader_layout_compat_array_element!($ty);
+        )+
+    };
+}
+
 /// Implements [`ShaderLayoutCompat`] (also implements [`ShaderLayout`]) for `[T; N]` for types implemented [`ShaderLayoutCompat`].
 ///
 /// Different from [`ShaderLayout`], the stride of array must be a multiple of 16.
@@ -76,7 +87,6 @@ macro_rules! impl_shader_layout_compat {
 macro_rules! impl_shader_layout_compat_array_element {
     ($($ty:ty),+$(,)?) => {
         $(
-            $crate::impl_shader_layout_array_element!($ty);
             impl $crate::ShaderLayoutCompatArrayElement for $ty {}
 
             // Assert array size is equal to `N * roundUp(16, roundUp(AlignOf(E), SizeOf(E)))`
