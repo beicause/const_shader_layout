@@ -8,10 +8,7 @@ harness = false
 name = "ui"
 
 [dependencies]
-const_shader_layout = {
-  path = "..",
-  features = ["derive", "glam", "half", "std"]
-}
+const_shader_layout = { path = "..", features = ["derive", "glam", "half", "std"] }
 glam = {
   version = "0.33",
   default-features = false,

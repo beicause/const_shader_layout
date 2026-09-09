@@ -23,17 +23,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 members = ["derive", "tests"]
 
 [dependencies]
-const_shader_layout_derive = {
-  path = "./derive",
-  version = "0.2.1",
-  optional = true
-}
-glam = {
-  version = "0.33",
-  default-features = false,
-  features = ["i16", "i32", "u16", "u32"],
-  optional = true
-}
+const_shader_layout_derive = { path = "./derive", version = "0.2.1", optional = true }
+glam = { version = "0.33", default-features = false, features = ["i16", "i32", "u16", "u32"], optional = true }
 half = { version = "2", default-features = false, optional = true }
 
 [features]
