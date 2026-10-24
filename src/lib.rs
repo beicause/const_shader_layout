@@ -16,8 +16,8 @@ pub use const_shader_layout_derive::{
     ShaderLayout, ShaderLayoutCompat, ShaderLayoutCompatArrayElement,
 };
 
-#[cfg(feature = "glam")]
-#[cfg_attr(docsrs, doc(cfg(feature = "glam")))]
+#[cfg(any(feature = "glam_33", feature = "glam_34"))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = "glam_33", feature = "glam_34"))))]
 mod glam;
 #[cfg(feature = "half")]
 #[cfg_attr(docsrs, doc(cfg(feature = "half")))]
