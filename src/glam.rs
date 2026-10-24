@@ -1,4 +1,9 @@
-#[cfg(feature = "glam")]
+#[cfg(all(feature = "glam_033", not(feature = "glam_034")))]
+use glam_033 as glam;
+#[cfg(feature = "glam_034")]
+use glam_034 as glam;
+
+#[cfg(any(feature = "glam_033", feature = "glam_034"))]
 use glam::{
     I16Vec2, I16Vec3, I16Vec4, IVec2, IVec3, IVec4, Mat2, Mat3A, Mat4, Quat, U16Vec2, U16Vec3,
     U16Vec4, UVec2, UVec3, UVec4, Vec2, Vec3, Vec3A, Vec4,

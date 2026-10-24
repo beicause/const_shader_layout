@@ -76,7 +76,8 @@ See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what
 | Feature | Description |
 |---------|-------------|
 | `derive`(default) | Enable `ShaderLayout`, `ShaderLayoutCompat` derive macros  |
-| `glam` (default) | Implements `ShaderLayout`/`ShaderLayoutCompat` for `glam` types |
+| `glam_033` | Implements `ShaderLayout`/`ShaderLayoutCompat` for `glam` v0.33 types |
+| `glam_034` | Implements `ShaderLayout`/`ShaderLayoutCompat` for `glam` v0.34 types. Overrides `glam_033` if both are enabled |
 | `half` | Implements `ShaderLayout`/`ShaderLayoutCompat` for `half::f16` and array of it |
 | `std` (default), `libm`, `nostd-libm` | Re-export `glam`'s corresponding features |
 
