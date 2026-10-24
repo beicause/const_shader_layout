@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 0.5.1
 
 **Breaking changes**
 
