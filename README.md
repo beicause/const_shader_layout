@@ -69,7 +69,7 @@ pub struct MyUniform {
 
 ```
 
-See <https://github.com/beicause/const_shader_layout/tree/master/tests> for what this supports and checks.
+See <https://github.com/beicause/const_shader_layout/tree/main/tests> for what this supports and checks.
 
 ## Features
 
