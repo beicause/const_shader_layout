@@ -10,4 +10,7 @@ keywords = ["const", "macro", "shader", "wgsl"]
 [lib]
 proc-macro = true
 
+[lints]
+workspace = true
+
 [dependencies]
